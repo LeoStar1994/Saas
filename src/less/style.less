@@ -1,0 +1,228 @@
+@import "./_variables.less";
+
+// page contont style
+.content-contain {
+  height: 100%;
+  background-color: @base-bg-color;
+  border-radius: 4px;
+}
+
+/* clearfix */
+.clearfix:after {
+  content: "";
+  visibility: hidden;
+  clear: both;
+  display: block;
+  height: 0;
+}
+
+.clearfix {
+  *zoom: 1;
+}
+
+//float
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+// width | height percents
+each(@percents, {
+    .w@{key} {
+      width: @value
+    }
+
+    .h@{key} {
+      height: @value
+    }
+  }
+
+);
+
+// width | height numbers
+.numbers(@widthMax);
+
+.numbers(@n, @i: 10) when (@i =< @n) {
+  .w@{i} {
+    width: 0px + @i;
+  }
+
+  .h@{i} {
+    height: 0px + @i;
+  }
+
+  .numbers(@n, (@i + @widthStep))
+}
+
+/* margin | padding
+*  mt-2 {margin-top: 2px} pb-2: {padding-bottom: 2px} 
+*  mx-2 {margin-left&right: 2px}  py-2:{padding-top&bottom: 2px}
+*  from 2 to 50
+*/
+each(@spacing-types, .(@typeVal, @tpyeKey) {
+    each(@spacing-directions, .(@directionVal, @directionKey) {
+        each(.spacing-sizes(), {
+
+            // mt-2 pb-2
+            .@{tpyeKey}@{directionKey}-@{key} {
+              @{typeVal}-@{directionVal}: @value + 0px;
+            }
+
+            // mx-2 px-2
+            .@{tpyeKey}x-@{key} {
+              @{typeVal}-left: @value + 0px;
+              @{typeVal}-right: @value + 0px;
+            }
+
+            // my-2 py-2
+            .@{tpyeKey}y-@{key} {
+              @{typeVal}-top: @value + 0px;
+              @{typeVal}-bottom: @value + 0px;
+            }
+          }
+
+        )
+      }
+
+    )
+  }
+
+);
+
+// font-size
+.fz(@fontSizeMax);
+
+.fz(@n, @i: 12) when (@i =< @n) {
+  .fz-@{i} {
+    font-size: 0px + @i;
+  }
+
+  .fz(@n, (@i + @fontSizeStep))
+}
+
+// line-height
+.lh(@lineHeightMax);
+
+.lh(@n, @i: 0) when (@i =< @n) {
+  .lh-@{i} {
+    line-height: 0px + @i;
+  }
+
+  .lh(@n, (@i + @lineHeightStep))
+}
+
+// color
+each(@colors, {
+
+    // 文字
+    .text-@{key} {
+      color: @value!important
+    }
+
+    // 背景
+    .bg-@{key} {
+      background-color: @value  !important;
+    }
+  }
+
+);
+
+// text-align
+each(@text-directions, {
+    .text-@{value} {
+      text-align: @value
+    }
+  }
+
+);
+
+// opacity
+each(@percents, {
+    .opacity-@{key} {
+      opacity: @value
+    }
+  }
+
+);
+
+// display
+each(@dispalys, {
+    .d-@{key} {
+      display: @value
+    }
+  }
+
+);
+
+// position
+each(@positions, {
+    .pos-@{key} {
+      position: @value
+    }
+  }
+
+);
+
+// cursor
+each(@cursors, {
+    .cursor-@{key} {
+      cursor: @value
+    }
+  }
+
+);
+
+// overflow
+each(@overflows, {
+    .overflow-@{key} {
+      overflow: @value
+    }
+  }
+
+);
+
+.overflow-scroll-x {
+  overflow-x: auto;
+}
+
+.overflow-scroll-y {
+  overflow-y: auto;
+}
+
+/* flex */
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+// justify-content
+each(@flex-jc, {
+    .jc-@{key} {
+      justify-content: @value
+    }
+  }
+
+);
+
+// align-items
+each(@flex-ai, {
+    .ai-@{key} {
+      align-items: @value
+    }
+  }
+
+);
