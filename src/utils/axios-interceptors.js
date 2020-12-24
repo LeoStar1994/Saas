@@ -1,4 +1,5 @@
-import Cookie from 'js-cookie'
+import Cookie from "js-cookie";
+import { logout } from "@/services/user";
 // 401拦截
 const resp401 = {
   /**
@@ -8,11 +9,11 @@ const resp401 = {
    * @returns {*}
    */
   onFulfilled(response, options) {
-    const {message} = options
+    const { message } = options;
     if (response.code === 401) {
-      message.error('无此权限')
+      message.error("无此权限");
     }
-    return response
+    return response;
   },
   /**
    * 响应出错时执行
@@ -21,32 +22,62 @@ const resp401 = {
    * @returns {Promise<never>}
    */
   onRejected(error, options) {
-    const {message} = options
-    const {response} = error
+    const { message } = options;
+    const { response } = error;
     if (response.status === 401) {
-      message.error('无此权限')
+      message.error("无此权限");
     }
-    return Promise.reject(error)
-  }
-}
+    return Promise.reject(error);
+  },
+};
 
 const resp403 = {
   onFulfilled(response, options) {
-    const {message} = options
+    const { message } = options;
     if (response.code === 403) {
-      message.error('请求被拒绝')
+      message.error("请求被拒绝");
     }
-    return response
+    return response;
   },
   onRejected(error, options) {
-    const {message} = options
-    const {response} = error
+    const { message } = options;
+    const { response } = error;
     if (response.status === 403) {
-      message.error('请求被拒绝')
+      message.error("请求被拒绝");
     }
-    return Promise.reject(error)
-  }
-}
+    return Promise.reject(error);
+  },
+};
+
+// 重新登录拦截
+const respReLogin = {
+  onFulfilled(response, options) {
+    const { message, router } = options;
+    if (
+      response.data.code === 900 ||
+      response.data.code === 901 ||
+      response.data.code === 902 ||
+      response.data.code === 903 ||
+      response.data.code === 1053 ||
+      response.data.code === 1054
+    ) {
+      message.error("您的登录已失效，请重新登录");
+      setTimeout(() => {
+        logout();
+        router.push("/login");
+      }, 2000);
+    }
+    return response;
+  },
+  onRejected(error) {
+    // const { message } = options;
+    // const { response } = error;
+    // if (response.status === 403) {
+    //   message.error("请求被拒绝");
+    // }
+    return Promise.reject(error);
+  },
+};
 
 const reqCommon = {
   /**
@@ -56,12 +87,16 @@ const reqCommon = {
    * @returns {*}
    */
   onFulfilled(config, options) {
-    const {message} = options
-    const {url, xsrfCookieName} = config
-    if (url.indexOf('login') === -1 && xsrfCookieName && !Cookie.get(xsrfCookieName)) {
-      message.warning('认证 token 已过期，请重新登录')
+    const { message } = options;
+    const { url, xsrfCookieName } = config;
+    if (
+      url.indexOf("login") === -1 &&
+      xsrfCookieName &&
+      !Cookie.get(xsrfCookieName)
+    ) {
+      message.warning("认证 token 已过期，请重新登录");
     }
-    return config
+    return config;
   },
   /**
    * 请求出错时做点什么
@@ -70,13 +105,13 @@ const reqCommon = {
    * @returns {Promise<never>}
    */
   onRejected(error, options) {
-    const {message} = options
-    message.error(error.message)
-    return Promise.reject(error)
-  }
-}
+    const { message } = options;
+    message.error(error.message);
+    return Promise.reject(error);
+  },
+};
 
 export default {
   request: [reqCommon], // 请求拦截
-  response: [resp401, resp403] // 响应拦截
-}
+  response: [resp401, resp403, respReLogin], // 响应拦截
+};

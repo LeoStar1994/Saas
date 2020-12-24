@@ -2,12 +2,13 @@
  * @Description: 权限管理 / 角色管理.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2020-12-23 18:00:28
+ * @LastEditTime: 2020-12-24 17:20:21
  * @LastEditors: Leo
 -->
 <template>
   <div class="usersManagement-page">
-    <a-card :style="`min-height: ${pageMinHeight}px`">
+    <a-card :style="`min-height: ${pageMinHeight}px`"
+            v-show="!configshow">
       <!-- search -->
       <div :class="advanced ? 'search' : null">
         <a-form-model ref="ruleForm"
@@ -56,7 +57,7 @@
           <!-- 查询、重置、收起 -->
           <span style="float: right; margin-top: 3px;">
             <a-button type="primary"
-                      @click="searchTableData">查询</a-button>
+                      @click="searchTableData()">查询</a-button>
             <a-button style="margin-left: 8px"
                       @click="reset">重置</a-button>
             <a @click="toggleAdvanced"
@@ -72,56 +73,74 @@
         <div class="operator">
           <a-button @click="openAlarm(0)"
                     class="mr-10"
-                    type="primary">新建</a-button>
+                    type="primary">新增</a-button>
           <a-button>批量操作</a-button>
         </div>
         <!-- table -->
         <standard-table :columns="columns"
+                        rowKey="sequenceNumber"
                         :dataSource="dataSource"
                         :loading="tableLoading"
                         :pagination="pagination"
-                        rowKey="id"
                         @change="handleTableChange">
-          <div slot="status"
+          <div slot="state"
                slot-scope="{text}">
-            <span :class="[text === 1 ? 'text-red': '', text === 2 ? 'text-orange': '', text === 3 ? 'text-blue': '']">{{statusMapText[text]}}</span>
+            <span :class="[text === 0 ? 'text-green': '', text === 1 ? 'text-red': '']">{{statusMapText[text]}}</span>
           </div>
           <div slot="action"
-               slot-scope="{text, record}">
+               slot-scope="{record}">
             <a class="mr-12"
-               @click="openAlarm(1)">详情
+               @click="openAlarm(1, record.sequenceNumber)">详情
             </a>
             <a class="mr-12"
-               @click="openAlarm(2)">修改</a>
-            <a @click="stopService(record)"
+               @click="openAlarm(2, record.sequenceNumber)">修改</a>
+            <a @click="changeService(record.sequenceNumber, 0)"
+               v-if="record.state === 1"
+               class="text-green mr-12">启用</a>
+            <a @click="changeService(record.sequenceNumber, 1)"
+               v-if="record.state === 0"
                class="text-orange mr-12">停用</a>
-            <a @click="deleteInfo(text)"
-               class="text-red">删除</a>
+            <a-popconfirm title="是否删除该条数据?"
+                          ok-text="确定"
+                          cancel-text="取消"
+                          @confirm="deleteInfo(record.sequenceNumber)"
+                          @cancel="deletecancel">
+              <a href="#"
+                 class="text-red">删除</a>
+            </a-popconfirm>
           </div>
         </standard-table>
       </div>
     </a-card>
-    <UsersConfig :configshow="configshow"
+    <UsersConfig ref="userConfig"
+                 :configshow="configshow"
                  :treeData="treeData"
-                 @closeConfig='closeConfig'></UsersConfig>
+                 @closeConfig='closeConfig'
+                 @searchTableData='searchTableData'></UsersConfig>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import StandardTable from "@/components/table/StandardTable";
-import { getUsersTableData, rolesTreeList } from "@/services/usersManagement";
+import {
+  getUsersTableData,
+  rolesTreeList,
+  changeUserState,
+  deleteUserInfo,
+  initUserDetail,
+} from "@/services/usersManagement";
 import UsersConfig from "./UsersConfig";
 
 // table columns data
 const columns = [
   {
     title: "序号",
-    dataIndex: "sortNum",
+    dataIndex: "sequenceNumber",
   },
   {
     title: "用户",
-    dataIndex: "user",
+    dataIndex: "name",
   },
   {
     title: "账号",
@@ -129,7 +148,7 @@ const columns = [
   },
   {
     title: "手机号",
-    dataIndex: "phone",
+    dataIndex: "mobile",
   },
   {
     title: "创建时间",
@@ -141,12 +160,12 @@ const columns = [
   },
   {
     title: "角色名称",
-    dataIndex: "roleName",
+    dataIndex: "rolesName",
   },
   {
     title: "状态",
-    dataIndex: "status",
-    scopedSlots: { customRender: "status" },
+    dataIndex: "state",
+    scopedSlots: { customRender: "state" },
   },
   {
     title: "操作",
@@ -168,6 +187,7 @@ export default {
       dataSource: [],
       pagination: {
         pageSize: 10,
+        pageNo: 1,
         total: 0,
         pageSizeOptions: ["10", "15", "20"],
         showSizeChanger: true,
@@ -188,9 +208,8 @@ export default {
         mobile: [],
       },
       statusMapText: {
-        1: "审核中",
-        2: "审核失败",
-        3: "审核通过",
+        0: "启用",
+        1: "停用",
       },
     };
   },
@@ -220,6 +239,8 @@ export default {
               title: item.name,
             };
           });
+        } else {
+          this.$message.error(result.desc);
         }
       });
     },
@@ -232,59 +253,115 @@ export default {
     /**
      * @description: 打开详情页
      * @param : status{int} 0: 新增， 1:查看， 2:修改
+     * @param : id{int}
      * @return {*}
      * @author: Leo
      */
-    openAlarm(status) {
-      console.log(status);
+    async openAlarm(status, id) {
+      if (status === 1 || status === 2) {
+        await this.userConfigDetail(id);
+      }
+      this.$refs.userConfig.setOpenType(status, id);
       this.configshow = true;
     },
 
-    // 关闭详情alarm
-    closeConfig() {
-      this.configshow = false;
+    // 查看 | 修改返显数据
+    userConfigDetail(id) {
+      initUserDetail(id).then((res) => {
+        const result = res.data;
+        if (result.code === 0) {
+          this.$message.success(result.desc);
+          this.$refs.userConfig.form = {
+            name: result.data.name,
+            account: result.data.account,
+            mobile: result.data.mobile,
+            password: result.data.password,
+            remark: result.data.remark,
+            roles: result.data.roles,
+            state: result.data.state.toString(),
+          };
+        } else {
+          this.$message.error(result.desc);
+        }
+      });
     },
 
     // 停用
-    stopService() {},
+    changeService(sequenceNumber, state) {
+      const data = {
+        sequenceNumber,
+        state,
+      };
+      changeUserState(data).then((res) => {
+        const result = res.data;
+        if (result.code === 0) {
+          this.$message.success(result.desc);
+          this.searchTableData();
+        } else {
+          this.$message.error(result.desc);
+        }
+      });
+    },
 
     // 删除
-    deleteInfo() {},
+    deleteInfo(id) {
+      deleteUserInfo(id).then((res) => {
+        const result = res.data;
+        if (result.code === 0) {
+          this.$message.success(result.desc);
+          this.searchTableData();
+        } else {
+          this.$message.error(result.desc);
+        }
+      });
+    },
+
+    deletecancel() {
+      this.$message.warning("删除操作已取消");
+    },
 
     // 列表查询
     searchTableData() {
-      const data = { ...this.form };
+      const data = {
+        ...this.form,
+        pageNo: this.pagination.pageNo,
+        pageSize: this.pagination.pageSize,
+      };
       this.tableLoading = true;
       getUsersTableData(data).then((res) => {
         const result = res.data;
         if (result.code === 0) {
-          this.dataSource = result.data;
-          this.pagination.total = result.total;
+          this.dataSource = result.data.records;
+          this.pagination.total = result.data.total;
         }
         this.tableLoading = false;
       });
     },
 
-    handleTableChange(pagination, filters, sorter) {
-      console.log(pagination);
-      console.log(filters);
-      console.log(sorter);
-      const pager = { ...this.pagination };
-      pager.current = pagination.current;
-      // this.pagination = pager;
-      // this.fetch({
-      //   results: pagination.pageSize,
-      //   page: pagination.current,
-      //   sortField: sorter.field,
-      //   sortOrder: sorter.order,
-      //   ...filters
-      // });
+    // 分页
+    handleTableChange(pagination) {
+      let { current, pageSize } = pagination;
+      this.pagination.pageSize = pageSize;
+      this.pagination.pageNo = current;
+      this.searchTableData();
+    },
+
+    // 重置分页数据
+    resetPagination() {
+      this.pagination.pageSize = 10;
+      this.pagination.total = 0;
     },
 
     // 重置
     reset() {
       this.$refs.ruleForm.resetFields();
       this.dataSource = [];
+      this.resetPagination();
+    },
+
+    // 关闭详情config
+    closeConfig() {
+      this.configshow = false;
     },
   },
   // 监听页面离开事件， 清空页面数据

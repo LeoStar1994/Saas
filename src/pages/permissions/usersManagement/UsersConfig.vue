@@ -2,7 +2,7 @@
  * @Description: 用户管理details详情页
  * @Author: Leo
  * @Date: 2020-12-23 14:52:44
- * @LastEditTime: 2020-12-23 18:01:22
+ * @LastEditTime: 2020-12-24 17:18:34
  * @LastEditors: Leo
 -->
 <template>
@@ -50,8 +50,8 @@
         <a-form-model-item label="状态"
                            prop="state">
           <a-radio-group v-model="form.state">
-            <a-radio value="1">启用</a-radio>
-            <a-radio value="2">停用</a-radio>
+            <a-radio value="0">启用</a-radio>
+            <a-radio value="1">停用</a-radio>
           </a-radio-group>
         </a-form-model-item>
         <a-form-model-item label="备注"
@@ -68,11 +68,13 @@
             <a-tree v-model="form.roles"
                     checkable
                     :tree-data="treeData" />
+            <a-empty v-if="treeData.length === 0" />
           </div>
         </a-form-model-item>
         <a-form-model-item :wrapper-col="{ span: 14, offset: 10 }">
           <a-button type="primary"
                     class="mr-20"
+                    :disabled="openType === 1"
                     @click="onSubmit">保存
           </a-button>
           <a-button style="margin-left: 10px;"
@@ -86,6 +88,7 @@
 
 <script>
 import { mapState } from "vuex";
+import { addUser, updateUser } from "@/services/usersManagement";
 
 export default {
   name: "UsersConfig",
@@ -102,6 +105,8 @@ export default {
   },
   data() {
     return {
+      openType: null, // 0新增 1查看 2修改
+      sequenceNumber: null, // 修改时使用，id
       labelCol: { span: 5 },
       wrapperCol: { span: 11, offset: 1 },
       form: {
@@ -111,7 +116,7 @@ export default {
         password: "",
         remark: "",
         roles: [],
-        state: "1",
+        state: "0",
       },
       // 搜索项校验规则
       rules: {
@@ -173,14 +178,43 @@ export default {
   },
   created() {},
   methods: {
+    setOpenType(openType, sequenceNumber) {
+      this.openType = openType;
+      this.sequenceNumber = sequenceNumber;
+    },
     // 保存
     onSubmit() {
-      console.log(this.form);
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
-          alert("submit!");
+          // alert("submit!");
+          const data = { ...this.form };
+          if (this.openType === 0) {
+            // 新增
+            addUser(data).then((res) => {
+              const result = res.data;
+              if (result.code === 0) {
+                this.$message.success(result.desc);
+                this.$emit("closeConfig");
+                this.$emit("searchTableData");
+              } else {
+                this.$message.error(result.desc);
+              }
+            });
+          } else if (this.openType === 2) {
+            // 修改
+            data.sequenceNumber = this.sequenceNumber;
+            updateUser(data).then((res) => {
+              const result = res.data;
+              if (result.code === 0) {
+                this.$message.success(result.desc);
+                this.$emit("closeConfig");
+                this.$emit("searchTableData");
+              } else {
+                this.$message.error(result.desc);
+              }
+            });
+          }
         } else {
-          console.log("error submit!!");
           return false;
         }
       });
@@ -206,7 +240,7 @@ export default {
 }
 .treebox {
   border: 1px solid #d9d9d9;
-  border-radius: 3px;
+  border-radius: 4px;
   padding: 10px 0;
   min-height: 180px;
 }

@@ -2,7 +2,7 @@
  * @Description: login登录页面.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2020-12-23 14:48:39
+ * @LastEditTime: 2020-12-24 18:27:58
  * @LastEditors: Leo
 -->
 
@@ -18,7 +18,8 @@
       </div>
     </div>
     <!-- login form -->
-    <div class="login">
+    <div class="login"
+         @keydown="keydownLogin">
       <a-tabs size="large"
               :tabBarStyle="{textAlign: 'center'}"
               @change="tabChange"
@@ -147,6 +148,11 @@
            class="text-white">忘记密码</a>
       </div>
     </div>
+
+    <!-- <transition name="el-fade-in">
+      <loading ref="loading"></loading>
+    </transition> -->
+
   </common-layout>
 </template>
 
@@ -286,6 +292,15 @@ export default {
       });
     },
 
+    // 回车登录
+    keydownLogin(e) {
+      let theEvent = window.event || e;
+      let key = theEvent.keyCode;
+      if (key === 13) {
+        this.loginSubmit(e);
+      }
+    },
+
     // 点击登录按钮
     loginSubmit(e) {
       if (this.currentTabKey === "commonLogin") {
@@ -297,6 +312,8 @@ export default {
 
     // 账户密码点击登录
     onSubmit(e) {
+      this.$refs.loading.openLoading("正在查询，请稍后。。");
+
       e.preventDefault();
       this.form.validateFields((err) => {
         if (!err) {
@@ -306,6 +323,7 @@ export default {
             ...allValues,
             verifyCodeToken: this.verifyCodeToken,
           };
+          console.log(login());
           login(data).then(this.afterLogin);
         }
       });
@@ -322,7 +340,6 @@ export default {
       };
       if (loginRes.code == 0) {
         // const { user, permissions, roles } = loginRes.data;
-        this.setUser(loginRes.user); // 设置user信息
         // this.setPermissions();
         // this.setRoles();
         // 设置token认证信息
@@ -332,12 +349,29 @@ export default {
         });
         // 获取路由配置
         getRoutesConfig().then((result) => {
-          const routesConfig = result.data.data.menuTree;
-          loginRes.user.name = result.data.data.account;
-          this.setUser(loginRes.user); // 设置user信息
-          loadRoutes(routesConfig);
-          this.$router.push("/permissions/usersManangement"); // 成功登录页跳转用户管理页
-          this.$message.success(loginRes.message, 3);
+          if (result.data.code === 0) {
+            // 过滤menu数组
+            const mapRoutesArr = result.data.data.menuTree.map((item) => {
+              return {
+                router: item.registerName,
+                name: item.name,
+                children: item.children.map((item1) => {
+                  return {
+                    router: item1.registerName,
+                    name: item1.name,
+                  };
+                }),
+              };
+            });
+            const routesConfig = [{ router: "root", children: mapRoutesArr }];
+            loginRes.user.name = result.data.data.account;
+            this.setUser(loginRes.user); // 设置user信息
+            loadRoutes(routesConfig);
+            this.$router.push("/permissions/usersManangement"); // 成功登录页跳转用户管理页
+            this.$message.success(loginRes.message, 3);
+          } else {
+            this.$message.error(result.data.desc);
+          }
         });
       } else {
         if (this.currentTabKey === "commonLogin") {

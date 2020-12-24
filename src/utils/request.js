@@ -1,27 +1,28 @@
-import axios from 'axios'
-import Cookie from 'js-cookie'
+import axios from "axios";
+import Cookie from "js-cookie";
 
 // 跨域认证信息 header 名
-const xsrfHeaderName = 'Authorization'
+const xsrfHeaderName = "Authorization";
 
-axios.defaults.timeout = 5000
-axios.defaults.withCredentials= true
-axios.defaults.xsrfHeaderName= xsrfHeaderName
-axios.defaults.xsrfCookieName= xsrfHeaderName
+axios.defaults.timeout = 5000;
+axios.defaults.withCredentials = true;
+axios.defaults.xsrfHeaderName = xsrfHeaderName;
+axios.defaults.xsrfCookieName = xsrfHeaderName;
 
 // 认证类型
 const AUTH_TYPE = {
-  BEARER: 'Bearer',
-  BASIC: 'basic',
-  AUTH1: 'auth1',
-  AUTH2: 'auth2',
-}
+  BEARER: "Bearer",
+  BASIC: "basic",
+  AUTH1: "auth1",
+  AUTH2: "auth2",
+};
 
 // http method
 const METHOD = {
-  GET: 'get',
-  POST: 'post'
-}
+  GET: "get",
+  POST: "post",
+  DELETE: "delete",
+};
 
 /**
  * axios请求
@@ -33,11 +34,13 @@ const METHOD = {
 async function request(url, method, params) {
   switch (method) {
     case METHOD.GET:
-      return axios.get(url, {params})
+      return axios.get(url, { params });
     case METHOD.POST:
-      return axios.post(url, params)
+      return axios.post(url, params);
+    case METHOD.DELETE:
+      return axios.delete(url + `/${params}`);
     default:
-      return axios.get(url, {params})
+      return axios.get(url, { params });
   }
 }
 
@@ -49,13 +52,15 @@ async function request(url, method, params) {
 function setAuthorization(auth, authType = AUTH_TYPE.BEARER) {
   switch (authType) {
     case AUTH_TYPE.BEARER:
-      Cookie.set(xsrfHeaderName, 'Bearer ' + auth.token, {expires: auth.expireAt})
-      break
+      Cookie.set(xsrfHeaderName, "Bearer " + auth.token, {
+        expires: auth.expireAt,
+      });
+      break;
     case AUTH_TYPE.BASIC:
     case AUTH_TYPE.AUTH1:
     case AUTH_TYPE.AUTH2:
     default:
-      break
+      break;
   }
 }
 
@@ -66,13 +71,13 @@ function setAuthorization(auth, authType = AUTH_TYPE.BEARER) {
 function removeAuthorization(authType = AUTH_TYPE.BEARER) {
   switch (authType) {
     case AUTH_TYPE.BEARER:
-      Cookie.remove(xsrfHeaderName)
-      break
+      Cookie.remove(xsrfHeaderName);
+      break;
     case AUTH_TYPE.BASIC:
     case AUTH_TYPE.AUTH1:
     case AUTH_TYPE.AUTH2:
     default:
-      break
+      break;
   }
 }
 
@@ -85,16 +90,16 @@ function checkAuthorization(authType = AUTH_TYPE.BEARER) {
   switch (authType) {
     case AUTH_TYPE.BEARER:
       if (Cookie.get(xsrfHeaderName)) {
-        return true
+        return true;
       }
-      break
+      break;
     case AUTH_TYPE.BASIC:
     case AUTH_TYPE.AUTH1:
     case AUTH_TYPE.AUTH2:
     default:
-      break
+      break;
   }
-  return false
+  return false;
 }
 
 /**
@@ -103,35 +108,35 @@ function checkAuthorization(authType = AUTH_TYPE.BEARER) {
  * @param options
  */
 function loadInterceptors(interceptors, options) {
-  const {request, response} = interceptors
+  const { request, response } = interceptors;
   // 加载请求拦截器
-  request.forEach(item => {
-    let {onFulfilled, onRejected} = item
-    if (!onFulfilled || typeof onFulfilled !== 'function') {
-      onFulfilled = config => config
+  request.forEach((item) => {
+    let { onFulfilled, onRejected } = item;
+    if (!onFulfilled || typeof onFulfilled !== "function") {
+      onFulfilled = (config) => config;
     }
-    if (!onRejected || typeof onRejected !== 'function') {
-      onRejected = error => Promise.reject(error)
+    if (!onRejected || typeof onRejected !== "function") {
+      onRejected = (error) => Promise.reject(error);
     }
     axios.interceptors.request.use(
-      config => onFulfilled(config, options),
-      error => onRejected(error, options)
-    )
-  })
+      (config) => onFulfilled(config, options),
+      (error) => onRejected(error, options)
+    );
+  });
   // 加载响应拦截器
-  response.forEach(item => {
-    let {onFulfilled, onRejected} = item
-    if (!onFulfilled || typeof onFulfilled !== 'function') {
-      onFulfilled = response => response
+  response.forEach((item) => {
+    let { onFulfilled, onRejected } = item;
+    if (!onFulfilled || typeof onFulfilled !== "function") {
+      onFulfilled = (response) => response;
     }
-    if (!onRejected || typeof onRejected !== 'function') {
-      onRejected = error => Promise.reject(error)
+    if (!onRejected || typeof onRejected !== "function") {
+      onRejected = (error) => Promise.reject(error);
     }
     axios.interceptors.response.use(
-      response => onFulfilled(response, options),
-      error => onRejected(error, options)
-    )
-  })
+      (response) => onFulfilled(response, options),
+      (error) => onRejected(error, options)
+    );
+  });
 }
 
 /**
@@ -140,20 +145,21 @@ function loadInterceptors(interceptors, options) {
  * @returns {Object}
  */
 function parseUrlParams(url) {
-  const params = {}
-  if (!url || url === '' || typeof url !== 'string') {
-    return params
+  const params = {};
+  if (!url || url === "" || typeof url !== "string") {
+    return params;
   }
-  const paramsStr = url.split('?')[1]
+  const paramsStr = url.split("?")[1];
   if (!paramsStr) {
-    return params
+    return params;
   }
-  const paramsArr = paramsStr.replace(/&|=/g, ' ').split(' ')
+  const paramsArr = paramsStr.replace(/&|=/g, " ").split(" ");
   for (let i = 0; i < paramsArr.length / 2; i++) {
-    const value = paramsArr[i * 2 + 1]
-    params[paramsArr[i * 2]] = value === 'true' ? true : (value === 'false' ? false : value)
+    const value = paramsArr[i * 2 + 1];
+    params[paramsArr[i * 2]] =
+      value === "true" ? true : value === "false" ? false : value;
   }
-  return params
+  return params;
 }
 
 export {
@@ -164,5 +170,5 @@ export {
   removeAuthorization,
   checkAuthorization,
   loadInterceptors,
-  parseUrlParams
-}
+  parseUrlParams,
+};

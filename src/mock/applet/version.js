@@ -10,18 +10,14 @@ for (let i = 0; i < 20; i++) {
     newestVersion: "1.6",
     auditResult: 1,
     failReason: "未提供相应证明",
-    id: i
+    id: i,
   });
 }
 
-Mock.mock(
-  `${process.env.VUE_APP_API_BASE_URL}/getVersionTableData`,
-  "get",
-  () => {
-    let result = {};
-    result.code = 0;
-    result.data = arr;
-    result.total = arr.length;
-    return result;
-  }
-);
+Mock.mock(`${process.env.VUE_APP_API_BASE_URL}/query`, "post", () => {
+  let result = {};
+  result.code = 900;
+  result.data = arr;
+  result.total = arr.length;
+  return result;
+});
