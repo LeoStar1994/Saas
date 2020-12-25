@@ -84,7 +84,7 @@ const routerMap = {
   dongpuUsers: {
     path: "/permissions/dongpuUsers",
     name: "动捕用户",
-    component: () => import("@/pages/permissions/dongpuUsers"),
+    component: () => import("@/pages/permissions/dongbuUsers"),
   },
 };
 export default routerMap;

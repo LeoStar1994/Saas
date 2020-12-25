@@ -2,7 +2,7 @@
  * @Description: 权限管理 / 角色管理.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2020-12-24 17:20:21
+ * @LastEditTime: 2020-12-25 15:30:49
  * @LastEditors: Leo
 -->
 <template>
@@ -33,7 +33,7 @@
               <a-col :md="8"
                      :sm="24">
                 <a-form-model-item label="账号"
-                                   prop="name">
+                                   prop="account">
                   <a-input v-model="form.account"
                            allowClear
                            :maxLength="10"
@@ -44,7 +44,7 @@
               <a-col :md="8"
                      :sm="24">
                 <a-form-model-item label="手机号"
-                                   prop="name">
+                                   prop="mobile">
                   <a-input v-model="form.mobile"
                            allowClear
                            :maxLength="10"
@@ -112,11 +112,16 @@
         </standard-table>
       </div>
     </a-card>
+    <!-- 详情config -->
     <UsersConfig ref="userConfig"
                  :configshow="configshow"
                  :treeData="treeData"
                  @closeConfig='closeConfig'
                  @searchTableData='searchTableData'></UsersConfig>
+    <!-- loading -->
+    <transition name="el-fade-in">
+      <loading ref="loading"></loading>
+    </transition>
   </div>
 </template>
 
@@ -233,12 +238,7 @@ export default {
       rolesTreeList().then((res) => {
         const result = res.data;
         if (result.code === 0) {
-          this.treeData = result.data.roleModels.map((item) => {
-            return {
-              key: item.id,
-              title: item.name,
-            };
-          });
+          this.treeData = result.data.roleModels;
         } else {
           this.$message.error(result.desc);
         }
@@ -261,13 +261,15 @@ export default {
       if (status === 1 || status === 2) {
         await this.userConfigDetail(id);
       }
-      this.$refs.userConfig.setOpenType(status, id);
       this.configshow = true;
+      this.$refs.userConfig.setOpenType(status, id);
     },
 
     // 查看 | 修改返显数据
     userConfigDetail(id) {
+      this.$refs.loading.openLoading("数据查询中，请稍后。。");
       initUserDetail(id).then((res) => {
+        this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
           this.$message.success(result.desc);
@@ -286,13 +288,15 @@ export default {
       });
     },
 
-    // 停用
+    // 停用 | 启用
     changeService(sequenceNumber, state) {
       const data = {
         sequenceNumber,
         state,
       };
+      this.$refs.loading.openLoading("操作进行中，请稍后。。");
       changeUserState(data).then((res) => {
+        this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
           this.$message.success(result.desc);
@@ -305,7 +309,9 @@ export default {
 
     // 删除
     deleteInfo(id) {
+      this.$refs.loading.openLoading("操作进行中，请稍后。。");
       deleteUserInfo(id).then((res) => {
+        this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
           this.$message.success(result.desc);
@@ -357,6 +363,7 @@ export default {
       this.$refs.ruleForm.resetFields();
       this.dataSource = [];
       this.resetPagination();
+      this.configshow = false;
     },
 
     // 关闭详情config

@@ -1,12 +1,12 @@
 <!--
- * @Description: 用户管理details详情页
+ * @Description: 角色管理详情
  * @Author: Leo
- * @Date: 2020-12-23 14:52:44
- * @LastEditTime: 2020-12-25 15:31:47
+ * @Date: 2020-12-25 11:00:00
+ * @LastEditTime: 2020-12-25 15:52:11
  * @LastEditors: Leo
 -->
 <template>
-  <div class="usersConfig-page"
+  <div class="roleConfig-page"
        v-if="configshow">
     <a-card :body-style="{padding: '24px 32px'}"
             :bordered="false"
@@ -17,38 +17,11 @@
                     :label-col="labelCol"
                     :wrapper-col="wrapperCol">
         <a-form-model-item required
-                           label="用户"
+                           label="角色名称"
                            prop="name">
           <a-input v-model="form.name"
-                   allowClear
                    :disabled="openType === 1"
-                   :maxLength="20" />
-        </a-form-model-item>
-        <a-form-model-item required
-                           label="账号"
-                           prop="account">
-          <a-input v-model="form.account"
-                   auto-complete="new-account"
                    allowClear
-                   :disabled="openType === 1"
-                   :maxLength="20" />
-        </a-form-model-item>
-        <a-form-model-item required
-                           label="密码"
-                           prop="password">
-          <a-input v-model="form.password"
-                   type="password"
-                   allowClear
-                   :disabled="openType === 1"
-                   auto-complete="new-password"
-                   :maxLength="20" />
-        </a-form-model-item>
-        <a-form-model-item required
-                           label="手机号"
-                           prop="mobile">
-          <a-input v-model="form.mobile"
-                   allowClear
-                   :disabled="openType === 1"
                    :maxLength="20" />
         </a-form-model-item>
         <a-form-model-item label="状态"
@@ -68,13 +41,13 @@
                    :auto-size="{ minRows: 3, maxRows: 5 }"
                    type="textarea" />
         </a-form-model-item>
-        <a-form-model-item label="角色"
-                           prop="roles">
+        <a-form-model-item label="B端业务"
+                           prop="selectedMenusList">
           <div class="treebox">
-            <a-tree v-model="form.roles"
+            <a-tree v-model="form.selectedMenusList"
                     checkable
-                    :disabled="openType === 1"
                     :replaceFields='treeDefaultObject'
+                    :disabled="openType === 1"
                     :tree-data="treeData" />
             <a-empty v-if="treeData.length === 0" />
           </div>
@@ -100,10 +73,10 @@
 
 <script>
 import { mapState } from "vuex";
-import { addUser, updateUser } from "@/services/usersManagement";
+import { addRole, updateRole } from "@/services/rolesManagement";
 
 export default {
-  name: "UsersConfig",
+  name: "RoleConfig",
   props: {
     configshow: {
       type: Boolean,
@@ -122,16 +95,14 @@ export default {
       labelCol: { span: 5 },
       wrapperCol: { span: 11, offset: 1 },
       treeDefaultObject: {
+        children: "children",
         title: "name",
         key: "id",
       },
       form: {
         name: "",
-        account: "",
-        mobile: "",
-        password: "",
         remark: "",
-        roles: [],
+        selectedMenusList: [],
         state: "0",
       },
       // 搜索项校验规则
@@ -139,50 +110,7 @@ export default {
         name: [
           {
             required: true,
-            message: "请输入用户",
-            trigger: "blur",
-          },
-          // {
-          //   min: 3,
-          //   max: 10,
-          //   message: "Length should be 3 to 5",
-          //   trigger: "blur",
-          // },
-        ],
-        account: [
-          {
-            required: true,
-            message: "请输入账号！",
-            trigger: "blur",
-          },
-          {
-            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
-            message: "账号必须输入邮箱！",
-            trigger: "blur",
-          },
-        ],
-        password: [
-          {
-            required: true,
-            message: "请输入密码！",
-            trigger: "blur",
-          },
-          {
-            min: 6,
-            max: 12,
-            message: "请输入6-12位密码！",
-            trigger: "blur",
-          },
-        ],
-        mobile: [
-          {
-            required: true,
-            message: "请输入手机号！",
-            trigger: "blur",
-          },
-          {
-            pattern: /^1\d{10}$/,
-            message: "请输入正确手机号！",
+            message: "请输入角色名称",
             trigger: "blur",
           },
         ],
@@ -211,7 +139,7 @@ export default {
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
-            addUser(data).then((res) => {
+            addRole(data).then((res) => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -225,7 +153,7 @@ export default {
           } else if (this.openType === 2) {
             // 修改
             data.sequenceNumber = this.sequenceNumber;
-            updateUser(data).then((res) => {
+            updateRole(data).then((res) => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -252,7 +180,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.usersConfig-page {
+.roleConfig-page {
   position: absolute;
   top: 0;
   left: 0;

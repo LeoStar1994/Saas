@@ -1,12 +1,12 @@
 <!--
- * @Description: 权限管理 / 角色管理.
+ * @Description: 权限管理 / 动捕用户.
  * @Author: Leo
- * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2020-12-25 17:24:54
+ * @Date: 2020-12-23 11:21:16
+ * @LastEditTime: 2020-12-25 17:03:06
  * @LastEditors: Leo
 -->
 <template>
-  <div class="rolesManagement-page">
+  <div class="dongbuUsers-page">
     <a-card :style="`min-height: ${pageMinHeight}px`"
             v-show="!configshow">
       <!-- search -->
@@ -18,15 +18,26 @@
                       :wrapper-col="wrapperCol">
           <div :class="advanced ? null: 'fold'">
             <a-row>
-              <!-- 角色名称 -->
+              <!-- 账号 -->
               <a-col :md="8"
                      :sm="24">
-                <a-form-model-item label="角色名称"
-                                   prop="name">
-                  <a-input v-model="form.name"
+                <a-form-model-item label="账号"
+                                   prop="account">
+                  <a-input v-model="form.account"
                            allowClear
                            :maxLength="10"
-                           placeholder="请输入用户名"></a-input>
+                           placeholder="请输入账号"></a-input>
+                </a-form-model-item>
+              </a-col>
+              <!-- 手机号 -->
+              <a-col :md="8"
+                     :sm="24">
+                <a-form-model-item label="手机号"
+                                   prop="mobile">
+                  <a-input v-model="form.mobile"
+                           allowClear
+                           :maxLength="10"
+                           placeholder="请输入手机号"></a-input>
                 </a-form-model-item>
               </a-col>
             </a-row>
@@ -90,11 +101,11 @@
       </div>
     </a-card>
     <!-- 详情config -->
-    <RoleConfig ref="roleConfig"
-                :configshow="configshow"
-                :treeData="treeData"
-                @closeConfig='closeConfig'
-                @searchTableData='searchTableData'></RoleConfig>
+    <DongbuConfig ref="dongbuConfig"
+                  :configshow="configshow"
+                  :treeData="treeData"
+                  @closeConfig='closeConfig'
+                  @searchTableData='searchTableData'></DongbuConfig>
     <!-- loading -->
     <transition name="el-fade-in">
       <loading ref="loading"></loading>
@@ -106,13 +117,13 @@
 import { mapState } from "vuex";
 import StandardTable from "@/components/table/StandardTable";
 import {
-  getRoleTableData,
-  roleTreeList,
-  changeRoleState,
-  deleteRoleInfo,
-  initRoleDetail,
-} from "@/services/rolesManagement";
-import RoleConfig from "./RoleConfig";
+  getDongbuTableData,
+  dongbuTreeList,
+  changeDongbuUserState,
+  deleteDongbuUserInfo,
+  initDongbuUserDetail,
+} from "@/services/dongbuUsers";
+import DongbuConfig from "./DongbuConfig";
 
 // table columns data
 const columns = [
@@ -121,8 +132,12 @@ const columns = [
     dataIndex: "sequenceNumber",
   },
   {
-    title: "角色名称",
-    dataIndex: "name",
+    title: "账号",
+    dataIndex: "account",
+  },
+  {
+    title: "手机号",
+    dataIndex: "mobile",
   },
   {
     title: "创建时间",
@@ -144,8 +159,8 @@ const columns = [
 ];
 
 export default {
-  name: "RolesManageMent",
-  components: { StandardTable, RoleConfig },
+  name: "DongbuUsers",
+  components: { StandardTable, DongbuConfig },
   i18n: require("./i18n"),
   data() {
     return {
@@ -167,11 +182,13 @@ export default {
       labelCol: { span: 5 },
       wrapperCol: { span: 18, offset: 1 },
       form: {
-        name: undefined,
+        mobile: undefined,
+        account: undefined,
       },
       // 搜索项校验规则
       rules: {
-        name: [],
+        mobile: [],
+        account: [],
       },
       statusMapText: {
         0: "启用",
@@ -196,29 +213,14 @@ export default {
   methods: {
     // 获取角色tree list
     getRolesList() {
-      roleTreeList().then((res) => {
+      dongbuTreeList().then((res) => {
         const result = res.data;
         if (result.code === 0) {
-          this.treeData = result.data.menuModels;
-          // this.treeData = this.formatRoleTreeData(result.data.menuModels);
+          this.treeData = result.data.applicationModels;
         } else {
           this.$message.error(result.desc);
         }
       });
-    },
-    // 格式化tree组件
-    formatRoleTreeData(targetArr) {
-      let mapArr;
-      if (targetArr.length > 0 && targetArr instanceof Array) {
-        mapArr = targetArr.map((item) => {
-          return {
-            key: item.id,
-            title: item.name,
-            children: item.children && this.formatRoleTreeData(item.children),
-          };
-        });
-      }
-      return mapArr;
     },
 
     // 切换搜索框收起展开
@@ -235,24 +237,26 @@ export default {
      */
     async openAlarm(status, id) {
       if (status === 1 || status === 2) {
-        await this.roleConfigDetail(id);
+        await this.dongbuConfigDetail(id);
       }
       this.configshow = true;
-      this.$refs.roleConfig.setOpenType(status, id);
+      this.$refs.dongbuConfig.setOpenType(status, id);
     },
 
     // 查看 | 修改返显数据
-    roleConfigDetail(id) {
+    dongbuConfigDetail(id) {
       this.$refs.loading.openLoading("数据查询中，请稍后。。");
-      initRoleDetail(id).then((res) => {
+      initDongbuUserDetail(id).then((res) => {
         this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
           this.$message.success(result.desc);
-          this.$refs.roleConfig.form = {
-            name: result.data.name,
+          this.$refs.dongbuConfig.form = {
+            account: result.data.account,
+            password: result.data.password,
+            mobile: result.data.mobile,
             remark: result.data.remark,
-            selectedMenusList: result.data.selectedMenusList,
+            applicationIds: result.data.applicationIds,
             state: result.data.state.toString(),
           };
         } else {
@@ -268,7 +272,7 @@ export default {
         state,
       };
       this.$refs.loading.openLoading("操作进行中，请稍后。。");
-      changeRoleState(data).then((res) => {
+      changeDongbuUserState(data).then((res) => {
         this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
@@ -283,7 +287,7 @@ export default {
     // 删除
     deleteInfo(id) {
       this.$refs.loading.openLoading("操作进行中，请稍后。。");
-      deleteRoleInfo(id).then((res) => {
+      deleteDongbuUserInfo(id).then((res) => {
         this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
@@ -307,7 +311,7 @@ export default {
         pageSize: this.pagination.pageSize,
       };
       this.tableLoading = true;
-      getRoleTableData(data).then((res) => {
+      getDongbuTableData(data).then((res) => {
         const result = res.data;
         if (result.code === 0) {
           this.dataSource = result.data.records;

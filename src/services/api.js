@@ -24,7 +24,20 @@ module.exports = {
   USERSDELETE: `${BASE_URL}/BSSuser/delete`, // 删除数据
 
   // 角色管理
-  AUTHORTABLEDATA: `${BASE_URL}/getAuthorTableData`,
+  ROLETABLEDATA: `${BASE_URL}/BSSRole/query`, // table查询
+  ROLETREE: `${BASE_URL}/BSSRole/initAdd`, // 新增初始化，获取角色tree
+  ROLEADD: `${BASE_URL}/BSSRole/add`, // 新增
+  ROLEINITDATA: `${BASE_URL}/BSSRole/initMod`, // 修改初始化，返显数据
+  ROLEUPDATE: `${BASE_URL}/BSSRole/mod`, // 修改数据
+  ROLECHANGESTATE: `${BASE_URL}/BSSRole/modState`, // 启用 | 停用
+  ROLEDELETE: `${BASE_URL}/BSSRole/delete`, // 删除数据
 
   // 动捕用户
+  DONGBUTABLEDATA: `${BASE_URL}/dongbuuser/query`, // table查询
+  DONGBUTREE: `${BASE_URL}/dongbuuser/initAdd`, // 新增初始化，获取角色tree
+  DONGBUADD: `${BASE_URL}/dongbuuser/add`, // 新增
+  DONGBUINITDATA: `${BASE_URL}/dongbuuser/initMod`, // 修改初始化，返显数据
+  DONGBUUPDATE: `${BASE_URL}/dongbuuser/mod`, // 修改数据
+  DONGBUCHANGESTATE: `${BASE_URL}/dongbuuser/modState`, // 启用 | 停用
+  DONGBUDELETE: `${BASE_URL}/dongbuuser/delete`, // 删除数据
 };

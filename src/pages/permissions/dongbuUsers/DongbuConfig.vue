@@ -1,12 +1,12 @@
-<!--
- * @Description: 用户管理details详情页
+<!-- 
+ * @Description: 动捕用户详情
  * @Author: Leo
- * @Date: 2020-12-23 14:52:44
- * @LastEditTime: 2020-12-25 15:31:47
+ * @Date: 2020-12-25 16:35:52
+ * @LastEditTime: 2020-12-25 17:04:45
  * @LastEditors: Leo
 -->
 <template>
-  <div class="usersConfig-page"
+  <div class="dongbuConfig-page"
        v-if="configshow">
     <a-card :body-style="{padding: '24px 32px'}"
             :bordered="false"
@@ -16,14 +16,6 @@
                     :rules="rules"
                     :label-col="labelCol"
                     :wrapper-col="wrapperCol">
-        <a-form-model-item required
-                           label="用户"
-                           prop="name">
-          <a-input v-model="form.name"
-                   allowClear
-                   :disabled="openType === 1"
-                   :maxLength="20" />
-        </a-form-model-item>
         <a-form-model-item required
                            label="账号"
                            prop="account">
@@ -68,13 +60,13 @@
                    :auto-size="{ minRows: 3, maxRows: 5 }"
                    type="textarea" />
         </a-form-model-item>
-        <a-form-model-item label="角色"
-                           prop="roles">
+        <a-form-model-item label="系统"
+                           prop="applicationIds">
           <div class="treebox">
-            <a-tree v-model="form.roles"
+            <a-tree v-model="form.applicationIds"
                     checkable
-                    :disabled="openType === 1"
                     :replaceFields='treeDefaultObject'
+                    :disabled="openType === 1"
                     :tree-data="treeData" />
             <a-empty v-if="treeData.length === 0" />
           </div>
@@ -100,10 +92,10 @@
 
 <script>
 import { mapState } from "vuex";
-import { addUser, updateUser } from "@/services/usersManagement";
+import { addDongbuUser, updateDongbuUser } from "@/services/dongbuUsers";
 
 export default {
-  name: "UsersConfig",
+  name: "DongbuConfig",
   props: {
     configshow: {
       type: Boolean,
@@ -122,44 +114,31 @@ export default {
       labelCol: { span: 5 },
       wrapperCol: { span: 11, offset: 1 },
       treeDefaultObject: {
+        children: "children",
         title: "name",
         key: "id",
       },
       form: {
-        name: "",
         account: "",
-        mobile: "",
         password: "",
+        mobile: "",
         remark: "",
-        roles: [],
+        applicationIds: [],
         state: "0",
       },
       // 搜索项校验规则
       rules: {
-        name: [
-          {
-            required: true,
-            message: "请输入用户",
-            trigger: "blur",
-          },
-          // {
-          //   min: 3,
-          //   max: 10,
-          //   message: "Length should be 3 to 5",
-          //   trigger: "blur",
-          // },
-        ],
         account: [
           {
             required: true,
             message: "请输入账号！",
             trigger: "blur",
           },
-          {
-            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
-            message: "账号必须输入邮箱！",
-            trigger: "blur",
-          },
+          // {
+          //   pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+          //   message: "账号必须输入邮箱！",
+          //   trigger: "blur",
+          // },
         ],
         password: [
           {
@@ -211,7 +190,7 @@ export default {
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
-            addUser(data).then((res) => {
+            addDongbuUser(data).then((res) => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -225,7 +204,7 @@ export default {
           } else if (this.openType === 2) {
             // 修改
             data.sequenceNumber = this.sequenceNumber;
-            updateUser(data).then((res) => {
+            updateDongbuUser(data).then((res) => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -252,7 +231,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.usersConfig-page {
+.dongbuConfig-page {
   position: absolute;
   top: 0;
   left: 0;

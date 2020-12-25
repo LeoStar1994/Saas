@@ -2,7 +2,7 @@
  * @Description: login登录页面.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2020-12-24 18:27:58
+ * @LastEditTime: 2020-12-25 10:52:17
  * @LastEditors: Leo
 -->
 
@@ -148,11 +148,6 @@
            class="text-white">忘记密码</a>
       </div>
     </div>
-
-    <!-- <transition name="el-fade-in">
-      <loading ref="loading"></loading>
-    </transition> -->
-
   </common-layout>
 </template>
 
@@ -312,8 +307,6 @@ export default {
 
     // 账户密码点击登录
     onSubmit(e) {
-      this.$refs.loading.openLoading("正在查询，请稍后。。");
-
       e.preventDefault();
       this.form.validateFields((err) => {
         if (!err) {
@@ -323,7 +316,6 @@ export default {
             ...allValues,
             verifyCodeToken: this.verifyCodeToken,
           };
-          console.log(login());
           login(data).then(this.afterLogin);
         }
       });
