@@ -2,7 +2,7 @@
  * @Description: login登录页面.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2020-12-25 10:52:17
+ * @LastEditTime: 2021-01-08 14:14:48
  * @LastEditors: Leo
 -->
 
@@ -91,9 +91,10 @@
               <a-input size="default"
                        placeholder="请输入手机号"
                        :maxLength="13"
-                       v-decorator="['mobile', {rules: [{ required: true, validator: handleCheckMobile, whitespace: true}]}]">
+                       v-decorator="['mobile', {rules: [{ required: true, whitespace: true}]}]">
                 <a-icon slot="prefix"
                         type="mobile" />
+                <!-- , validator: handleCheckMobile -->
               </a-input>
             </a-form-item>
             <!-- 验证码 -->
@@ -148,11 +149,14 @@
            class="text-white">忘记密码</a>
       </div>
     </div>
+    <!-- 忘记密码 -->
+    <ForgetPassword ref="forgetPassword"></ForgetPassword>
   </common-layout>
 </template>
 
 <script>
 import CommonLayout from "@/layouts/CommonLayout";
+import ForgetPassword from "@/pages/forgetPassword";
 import {
   verifyCode,
   login,
@@ -205,7 +209,7 @@ const timeList = [
 
 export default {
   name: "Login",
-  components: { CommonLayout },
+  components: { CommonLayout, ForgetPassword },
   data() {
     return {
       logging: false,
@@ -402,12 +406,18 @@ export default {
       // ajax
       SMSCode({ mobile }).then((res) => {
         const result = res.data;
-        console.log(result);
+        if (result.code === 0) {
+          this.$message.success("短信验证码已发送，请注意查收");
+        } else {
+          this.$message.error(result.desc);
+        }
       });
     },
 
     // 忘记密码
-    forgetPassword() {},
+    forgetPassword() {
+      this.$refs.forgetPassword.visible = true;
+    },
   },
 };
 </script>

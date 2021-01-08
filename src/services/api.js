@@ -6,15 +6,18 @@ module.exports = {
   // 登录
   // LOGIN: `${BASE_URL}/login`, // 登录
   // ROUTES: `${BASE_URL}/routes`, // 获取menu菜单
+  // USERSTABLEDATA: `${BASE_URL}/query`, // table查询
 
   LOGIN: `${BASE_URL}/login/go`, // 登录
+  ROUTES: `${BASE_URL}/home`, // 获取menu菜单
   LOGINVERIFYCODE: `${BASE_URL}/login/verifyCode/image`, // 获取图形验证码
   LOGINSMSCODE: `${BASE_URL}/login/verifyCode/sms`, // 获取手机验证码
   LOGINBYPHONE: `${BASE_URL}/loginByPhone`, // 手机号登录
-  ROUTES: `${BASE_URL}/home`, // 获取menu菜单
+  FOEGETPASSWORD: `${BASE_URL}/login/forgetPassword/validMobile`, // 找回密码验证手机验证码
+  FOEGETPASSWORDCODE: `${BASE_URL}/login/forgetPassword`, // 忘记密码获取手机验证码
+  RESETPASSWORD: `${BASE_URL}/login/forgetPassword/modPassword`, // 重置修改密码
 
   // 用户管理
-  // USERSTABLEDATA: `${BASE_URL}/query`, // table查询
   USERSTABLEDATA: `${BASE_URL}/BSSuser/query`, // table查询
   USERSROLESTREE: `${BASE_URL}/BSSuser/initAdd`, // 新增初始化，获取角色tree
   USERSADD: `${BASE_URL}/BSSuser/add`, // 新增
