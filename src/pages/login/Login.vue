@@ -2,7 +2,7 @@
  * @Description: login登录页面.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2021-01-08 14:14:48
+ * @LastEditTime: 2021-01-12 17:12:45
  * @LastEditors: Leo
 -->
 
@@ -41,7 +41,8 @@
                        size="default"
                        :maxLength="20"
                        placeholder="请输入您的账号"
-                       v-decorator="['account', {rules: [{ required: true, whitespace: true, validator: handleCheckAccount}]}]">
+                       v-decorator="['account', {rules: [{ required: true, whitespace: true, message: '请输入您的账号'}]}]">
+                <!-- validator: handleCheckAccount -->
                 <a-icon slot="prefix"
                         type="user" />
               </a-input>
@@ -91,10 +92,9 @@
               <a-input size="default"
                        placeholder="请输入手机号"
                        :maxLength="13"
-                       v-decorator="['mobile', {rules: [{ required: true, whitespace: true}]}]">
+                       v-decorator="['mobile', {rules: [{ required: true, whitespace: true, validator: handleCheckMobile}]}]">
                 <a-icon slot="prefix"
                         type="mobile" />
-                <!-- , validator: handleCheckMobile -->
               </a-input>
             </a-form-item>
             <!-- 验证码 -->
@@ -359,7 +359,13 @@ export default {
                 }),
               };
             });
-            const routesConfig = [{ router: "root", children: mapRoutesArr }];
+            const welcome = {
+              router: "welcome",
+              name: "欢迎页面",
+            };
+            const routesConfig = [
+              { router: "root", children: [welcome, ...mapRoutesArr] },
+            ];
             loginRes.user.name = result.data.data.account;
             this.setUser(loginRes.user); // 设置user信息
             loadRoutes(routesConfig);

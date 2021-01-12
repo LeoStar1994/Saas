@@ -65,6 +65,13 @@ const routerMap = {
     component: view.tabs,
   },
 
+  welcome: {
+    path: "/welcome",
+    name: "欢迎页",
+    invisible: true,
+    component: () => import("@/pages/welcome"),
+  },
+
   // 权限管理
   permissions: {
     name: "权限管理",
