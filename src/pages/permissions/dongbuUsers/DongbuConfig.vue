@@ -16,32 +16,39 @@
                     :rules="rules"
                     :label-col="labelCol"
                     :wrapper-col="wrapperCol">
-        <a-form-model-item required
-                           label="账号"
+        <a-form-model-item label="账号"
                            prop="account">
           <a-input v-model="form.account"
                    auto-complete="new-account"
                    allowClear
+                   placeholder="请输入账号"
                    :disabled="openType === 1"
-                   :maxLength="20" />
+                   :maxLength="30" />
         </a-form-model-item>
-        <a-form-model-item required
-                           label="密码"
+        <a-form-model-item label="密码"
                            prop="password">
           <a-input v-model="form.password"
-                   type="password"
-                   allowClear
+                   :type="passwordType"
                    :disabled="openType === 1"
                    auto-complete="new-password"
-                   :maxLength="20" />
+                   placeholder="请输入密码"
+                   :maxLength="30">
+            <a-tooltip slot="suffix"
+                       title="查看密码">
+              <a-icon type="eye"
+                      v-if="form.password"
+                      @click="passwordType = 'text'"
+                      style="color: rgba(0,0,0,.45)" />
+            </a-tooltip>
+          </a-input>
         </a-form-model-item>
-        <a-form-model-item required
-                           label="手机号"
+        <a-form-model-item label="手机号"
                            prop="mobile">
           <a-input v-model="form.mobile"
                    allowClear
+                   placeholder="请输入手机号"
                    :disabled="openType === 1"
-                   :maxLength="20" />
+                   :maxLength="30" />
         </a-form-model-item>
         <a-form-model-item label="状态"
                            prop="state">
@@ -54,7 +61,8 @@
         <a-form-model-item label="备注"
                            prop="remark">
           <a-input v-model="form.remark"
-                   :maxLength="500"
+                   :maxLength="200"
+                   placeholder="请输入备注"
                    :disabled="openType === 1"
                    allowClear
                    :auto-size="{ minRows: 3, maxRows: 5 }"
@@ -99,24 +107,25 @@ export default {
   props: {
     configshow: {
       type: Boolean,
-      default: false,
+      default: false
     },
     treeData: {
       type: Array,
       required: true,
-      default: new Array(),
-    },
+      default: new Array()
+    }
   },
   data() {
     return {
       openType: null, // 0新增 1查看 2修改
       sequenceNumber: null, // 修改时使用，id
+      passwordType: "password",
       labelCol: { span: 5 },
       wrapperCol: { span: 11, offset: 1 },
       treeDefaultObject: {
         children: "children",
         title: "name",
-        key: "id",
+        key: "id"
       },
       form: {
         account: "",
@@ -124,7 +133,7 @@ export default {
         mobile: "",
         remark: "",
         applicationIds: [],
-        state: "0",
+        state: "0"
       },
       // 搜索项校验规则
       rules: {
@@ -132,44 +141,44 @@ export default {
           {
             required: true,
             message: "请输入账号！",
-            trigger: "blur",
+            trigger: "blur"
           },
-          // {
-          //   pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
-          //   message: "账号必须输入邮箱！",
-          //   trigger: "blur",
-          // },
+          {
+            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+            message: "账号必须输入邮箱！",
+            trigger: "blur"
+          }
         ],
         password: [
           {
             required: true,
             message: "请输入密码！",
-            trigger: "blur",
+            trigger: "blur"
           },
           {
             min: 6,
-            max: 12,
-            message: "请输入6-12位密码！",
-            trigger: "blur",
-          },
+            max: 30,
+            message: "请输入6-30位密码！",
+            trigger: "blur"
+          }
         ],
         mobile: [
           {
             required: true,
             message: "请输入手机号！",
-            trigger: "blur",
+            trigger: "blur"
           },
           {
             pattern: /^1\d{10}$/,
             message: "请输入正确手机号！",
-            trigger: "blur",
-          },
-        ],
-      },
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
   computed: {
-    ...mapState(["pageMinHeight"]),
+    ...mapState(["pageMinHeight"])
   },
   created() {},
   methods: {
@@ -177,20 +186,31 @@ export default {
       this.openType = openType;
       this.sequenceNumber = sequenceNumber;
       if (openType === 0) {
-        this.$nextTick(() => {
-          this.$refs.ruleForm.resetFields();
-        });
+        this.resetAllFields();
       }
     },
+
+    resetAllFields() {
+      this.form = {
+        account: "",
+        password: "",
+        mobile: "",
+        remark: "",
+        applicationIds: [],
+        state: "0"
+      };
+      this.passwordType = "password";
+    },
+
     // 保存
     onSubmit() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.ruleForm.validate(valid => {
         if (valid) {
           const data = { ...this.form };
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
-            addDongbuUser(data).then((res) => {
+            addDongbuUser(data).then(res => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -204,7 +224,7 @@ export default {
           } else if (this.openType === 2) {
             // 修改
             data.sequenceNumber = this.sequenceNumber;
-            updateDongbuUser(data).then((res) => {
+            updateDongbuUser(data).then(res => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -224,22 +244,14 @@ export default {
     // 取消
     resetForm() {
       this.$refs.ruleForm.resetFields();
+      this.passwordType = "password";
       this.$emit("closeConfig");
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style lang="less" scoped>
-.dongbuConfig-page {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  margin-top: 24px;
-}
 .treebox {
   border: 1px solid #d9d9d9;
   border-radius: 4px;

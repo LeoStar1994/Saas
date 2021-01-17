@@ -1,5 +1,5 @@
 <template>
-  <exception-page home-route="/permissions/usersManangement"
+  <exception-page home-route="/welcome"
                   :style="`min-height: ${minHeight}`"
                   type="403" />
 </template>
@@ -14,8 +14,8 @@ export default {
     ...mapState("setting", ["pageMinHeight"]),
     minHeight() {
       return this.pageMinHeight ? this.pageMinHeight + "px" : "100vh";
-    },
-  },
+    }
+  }
 };
 </script>
 

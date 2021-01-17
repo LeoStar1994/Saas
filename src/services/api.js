@@ -16,6 +16,7 @@ module.exports = {
   FOEGETPASSWORD: `${BASE_URL}/login/forgetPassword/validMobile`, // 找回密码验证手机验证码
   FOEGETPASSWORDCODE: `${BASE_URL}/login/forgetPassword`, // 忘记密码获取手机验证码
   RESETPASSWORD: `${BASE_URL}/login/forgetPassword/modPassword`, // 重置修改密码
+  USERAUDITPASSWORD: `${BASE_URL}/home/modPwd`, // 用户修改密码
 
   // 用户管理
   USERSTABLEDATA: `${BASE_URL}/BSSuser/query`, // table查询
@@ -42,5 +43,5 @@ module.exports = {
   DONGBUINITDATA: `${BASE_URL}/dongbuuser/initMod`, // 修改初始化，返显数据
   DONGBUUPDATE: `${BASE_URL}/dongbuuser/mod`, // 修改数据
   DONGBUCHANGESTATE: `${BASE_URL}/dongbuuser/modState`, // 启用 | 停用
-  DONGBUDELETE: `${BASE_URL}/dongbuuser/delete`, // 删除数据
+  DONGBUDELETE: `${BASE_URL}/dongbuuser/delete` // 删除数据
 };

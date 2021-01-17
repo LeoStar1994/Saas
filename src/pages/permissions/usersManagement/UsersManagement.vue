@@ -18,15 +18,15 @@
                       :wrapper-col="wrapperCol">
           <div :class="advanced ? null: 'fold'">
             <a-row>
-              <!-- 用户名 -->
+              <!-- 公司名称 -->
               <a-col :md="8"
                      :sm="24">
-                <a-form-model-item label="用户名"
+                <a-form-model-item label="公司名称"
                                    prop="name">
                   <a-input v-model="form.name"
                            allowClear
-                           :maxLength="10"
-                           placeholder="请输入用户名"></a-input>
+                           :maxLength="30"
+                           placeholder="请输入公司名称"></a-input>
                 </a-form-model-item>
               </a-col>
               <!-- 账号 -->
@@ -36,7 +36,7 @@
                                    prop="account">
                   <a-input v-model="form.account"
                            allowClear
-                           :maxLength="10"
+                           :maxLength="30"
                            placeholder="请输入账号"></a-input>
                 </a-form-model-item>
               </a-col>
@@ -47,11 +47,10 @@
                                    prop="mobile">
                   <a-input v-model="form.mobile"
                            allowClear
-                           :maxLength="10"
+                           :maxLength="30"
                            placeholder="请输入手机号"></a-input>
                 </a-form-model-item>
               </a-col>
-
             </a-row>
           </div>
           <!-- 查询、重置、收起 -->
@@ -60,11 +59,11 @@
                       @click="searchTableData()">查询</a-button>
             <a-button style="margin-left: 8px"
                       @click="reset">重置</a-button>
-            <a @click="toggleAdvanced"
+            <!-- <a @click="toggleAdvanced"
                style="margin-left: 8px">
               {{advanced ? '收起' : '展开'}}
               <a-icon :type="advanced ? 'up' : 'down'" />
-            </a>
+            </a> -->
           </span>
         </a-form-model>
       </div>
@@ -74,7 +73,6 @@
           <a-button @click="openAlarm(0)"
                     class="mr-10"
                     type="primary">新增</a-button>
-          <a-button>批量操作</a-button>
         </div>
         <!-- table -->
         <standard-table :columns="columns"
@@ -89,24 +87,30 @@
           </div>
           <div slot="action"
                slot-scope="{record}">
-            <a class="mr-12"
-               @click="openAlarm(1, record.sequenceNumber)">详情
-            </a>
-            <a class="mr-12"
-               @click="openAlarm(2, record.sequenceNumber)">修改</a>
-            <a @click="changeService(record.sequenceNumber, 0)"
-               v-if="record.state === 1"
-               class="text-green mr-12">启用</a>
-            <a @click="changeService(record.sequenceNumber, 1)"
-               v-if="record.state === 0"
-               class="text-orange mr-12">停用</a>
+            <a-button class="mr-12"
+                      size="small"
+                      type="primary"
+                      @click="openAlarm(1, record.sequenceNumber)">详情
+            </a-button>
+            <a-button class="mr-12"
+                      size="small"
+                      type="primary"
+                      @click="openAlarm(2, record.sequenceNumber)">修改</a-button>
+            <a-button @click="changeService(record.sequenceNumber, 0)"
+                      v-if="record.state === 1"
+                      size="small"
+                      class="greenButton mr-12">启用</a-button>
+            <a-button @click="changeService(record.sequenceNumber, 1)"
+                      size="small"
+                      v-if="record.state === 0"
+                      class="orangeButton mr-12">停用</a-button>
             <a-popconfirm title="是否删除该条数据?"
                           ok-text="确定"
                           cancel-text="取消"
                           @confirm="deleteInfo(record.sequenceNumber)"
                           @cancel="deletecancel">
-              <a href="#"
-                 class="text-red">删除</a>
+              <a-button type="danger"
+                        size="small">删除</a-button>
             </a-popconfirm>
           </div>
         </standard-table>
@@ -117,6 +121,7 @@
                  :configshow="configshow"
                  :treeData="treeData"
                  @closeConfig='closeConfig'
+                 @syncRoles="getRolesList"
                  @searchTableData='searchTableData'></UsersConfig>
     <!-- loading -->
     <transition name="el-fade-in">
@@ -133,49 +138,49 @@ import {
   rolesTreeList,
   changeUserState,
   deleteUserInfo,
-  initUserDetail,
+  initUserDetail
 } from "@/services/usersManagement";
 import UsersConfig from "./UsersConfig";
 
 // table columns data
 const columns = [
+  // {
+  //   title: "序号",
+  //   dataIndex: "sequenceNumber"
+  // },
   {
-    title: "序号",
-    dataIndex: "sequenceNumber",
-  },
-  {
-    title: "用户",
-    dataIndex: "name",
+    title: "公司名称",
+    dataIndex: "name"
   },
   {
     title: "账号",
-    dataIndex: "account",
+    dataIndex: "account"
   },
   {
     title: "手机号",
-    dataIndex: "mobile",
+    dataIndex: "mobile"
   },
   {
     title: "创建时间",
-    dataIndex: "createTime",
+    dataIndex: "createTime"
   },
   {
     title: "更新时间",
-    dataIndex: "updateTime",
+    dataIndex: "updateTime"
   },
   {
     title: "角色名称",
-    dataIndex: "rolesName",
+    dataIndex: "rolesName"
   },
   {
     title: "状态",
     dataIndex: "state",
-    scopedSlots: { customRender: "state" },
+    scopedSlots: { customRender: "state" }
   },
   {
     title: "操作",
-    scopedSlots: { customRender: "action" },
-  },
+    scopedSlots: { customRender: "action" }
+  }
 ];
 
 export default {
@@ -197,25 +202,25 @@ export default {
         pageSizeOptions: ["10", "15", "20"],
         showSizeChanger: true,
         showQuickJumper: true,
-        showTotal: (total) => `共 ${total} 条数据`,
+        showTotal: total => `共 ${total} 条数据`
       },
       labelCol: { span: 5 },
       wrapperCol: { span: 18, offset: 1 },
       form: {
         name: undefined,
         account: undefined,
-        mobile: undefined,
+        mobile: undefined
       },
       // 搜索项校验规则
       rules: {
         name: [],
         account: [],
-        mobile: [],
+        mobile: []
       },
       statusMapText: {
         0: "启用",
-        1: "停用",
-      },
+        1: "停用"
+      }
     };
   },
   computed: {
@@ -227,22 +232,28 @@ export default {
       } else {
         return this.$t("description");
       }
-    },
+    }
   },
   created() {
-    this.getRolesList();
+    this.searchTableData();
   },
   methods: {
     // 获取角色tree list
     getRolesList() {
-      rolesTreeList().then((res) => {
-        const result = res.data;
-        if (result.code === 0) {
-          this.treeData = result.data.roleModels;
-        } else {
-          this.$message.error(result.desc);
-        }
-      });
+      this.$refs.loading.openLoading("正在初始化数据，请稍后。。");
+      rolesTreeList()
+        .then(res => {
+          this.$refs.loading.closeLoading();
+          const result = res.data;
+          if (result.code === 0) {
+            this.treeData = result.data.roleModels;
+          } else {
+            this.$message.error(result.desc);
+          }
+        })
+        .catch(() => {
+          this.$refs.loading.closeLoading();
+        });
     },
 
     // 切换搜索框收起展开
@@ -263,16 +274,16 @@ export default {
       }
       this.configshow = true;
       this.$refs.userConfig.setOpenType(status, id);
+      this.getRolesList();
     },
 
     // 查看 | 修改返显数据
     userConfigDetail(id) {
       this.$refs.loading.openLoading("数据查询中，请稍后。。");
-      initUserDetail(id).then((res) => {
+      initUserDetail(id).then(res => {
         this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
-          this.$message.success(result.desc);
           this.$refs.userConfig.form = {
             name: result.data.name,
             account: result.data.account,
@@ -280,7 +291,7 @@ export default {
             password: result.data.password,
             remark: result.data.remark,
             roles: result.data.roles,
-            state: result.data.state.toString(),
+            state: result.data.state.toString()
           };
         } else {
           this.$message.error(result.desc);
@@ -292,10 +303,10 @@ export default {
     changeService(sequenceNumber, state) {
       const data = {
         sequenceNumber,
-        state,
+        state
       };
       this.$refs.loading.openLoading("操作进行中，请稍后。。");
-      changeUserState(data).then((res) => {
+      changeUserState(data).then(res => {
         this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
@@ -310,7 +321,7 @@ export default {
     // 删除
     deleteInfo(id) {
       this.$refs.loading.openLoading("操作进行中，请稍后。。");
-      deleteUserInfo(id).then((res) => {
+      deleteUserInfo(id).then(res => {
         this.$refs.loading.closeLoading();
         const result = res.data;
         if (result.code === 0) {
@@ -331,10 +342,10 @@ export default {
       const data = {
         ...this.form,
         pageNo: this.pagination.pageNo,
-        pageSize: this.pagination.pageSize,
+        pageSize: this.pagination.pageSize
       };
       this.tableLoading = true;
-      getUsersTableData(data).then((res) => {
+      getUsersTableData(data).then(res => {
         const result = res.data;
         if (result.code === 0) {
           this.dataSource = result.data.records;
@@ -361,7 +372,7 @@ export default {
     // 重置
     reset() {
       this.$refs.ruleForm.resetFields();
-      this.dataSource = [];
+      // this.dataSource = [];
       this.resetPagination();
       this.configshow = false;
     },
@@ -369,15 +380,37 @@ export default {
     // 关闭详情config
     closeConfig() {
       this.configshow = false;
-    },
+    }
   },
   // 监听页面离开事件， 清空页面数据
   beforeRouteLeave(to, from, next) {
     if (to.path !== from.path) {
-      this.reset();
+      if (this.configshow && this.$refs.userConfig.openType === 0) {
+        const _this = this;
+        this.$confirm({
+          title: "跳转其他页面会清空当前页面已填写的数据，是否继续?",
+          okText: "确定",
+          okType: "primary",
+          cancelText: "取消",
+          onOk() {
+            _this.reset();
+            next();
+          },
+          onCancel() {
+            _this.$message.warning("操作已取消");
+          }
+        });
+      } else {
+        next();
+        this.reset();
+      }
     }
-    next();
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.searchTableData();
+    });
+  }
 };
 </script>
 

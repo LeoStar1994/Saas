@@ -6,7 +6,7 @@
                   v-model="collapsed"
                   :trigger="null">
     <div :class="['logo', theme]">
-      <router-link to="/permissions/usersManangement">
+      <router-link to="/welcome">
         <img class="logoImg"
              src="@/assets/img/logo.png">
       </router-link>
@@ -29,34 +29,34 @@ export default {
     collapsible: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
     collapsed: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
     menuData: {
       type: Array,
-      required: true,
+      required: true
     },
     theme: {
       type: String,
       required: false,
-      default: "dark",
-    },
+      default: "dark"
+    }
   },
   computed: {
     sideTheme() {
       return this.theme == "light" ? this.theme : "dark";
     },
-    ...mapState("setting", ["isMobile"]),
+    ...mapState("setting", ["isMobile"])
   },
   methods: {
     onSelect(obj) {
       this.$emit("menuSelect", obj);
-    },
-  },
+    }
+  }
 };
 </script>
 

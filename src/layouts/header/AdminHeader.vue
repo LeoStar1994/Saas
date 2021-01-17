@@ -24,9 +24,9 @@
                 @select="onSelect" />
       </div>
       <div :class="['admin-header-right', headerTheme]">
-        <header-search class="header-item"
+        <!-- <header-search class="header-item"
                        @active="val => searchActive = val" />
-        <header-notice class="header-item" />
+        <header-notice class="header-item" /> -->
         <header-avatar class="header-item" />
         <!-- <a-dropdown class="lang header-item">
           <div>
@@ -45,24 +45,24 @@
 </template>
 
 <script>
-import HeaderSearch from "./HeaderSearch";
-import HeaderNotice from "./HeaderNotice";
+// import HeaderSearch from "./HeaderSearch";
+// import HeaderNotice from "./HeaderNotice";
 import HeaderAvatar from "./HeaderAvatar";
 import IMenu from "@/components/menu/menu";
 import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "AdminHeader",
-  components: { IMenu, HeaderAvatar, HeaderNotice, HeaderSearch },
+  components: { IMenu, HeaderAvatar },
   props: ["collapsed", "menuData"],
   data() {
     return {
       langList: [
         { key: "CN", name: "简体中文", alias: "简体" },
         { key: "HK", name: "繁體中文", alias: "繁體" },
-        { key: "US", name: "English", alias: "English" },
+        { key: "US", name: "English", alias: "English" }
       ],
-      searchActive: false,
+      searchActive: false
     };
   },
   computed: {
@@ -72,7 +72,7 @@ export default {
       "layout",
       "systemName",
       "lang",
-      "pageWidth",
+      "pageWidth"
     ]),
     headerTheme() {
       if (
@@ -85,7 +85,7 @@ export default {
       return this.theme.mode;
     },
     langAlias() {
-      let lang = this.langList.find((item) => item.key == this.lang);
+      let lang = this.langList.find(item => item.key == this.lang);
       return lang.alias;
     },
     menuWidth() {
@@ -93,7 +93,7 @@ export default {
       const headWidth = layout === "head" ? "100% - 188px" : "100%";
       const extraWidth = searchActive ? "600px" : "400px";
       return `calc(${headWidth} - ${extraWidth})`;
-    },
+    }
   },
   methods: {
     toggleCollapse() {
@@ -102,8 +102,8 @@ export default {
     onSelect(obj) {
       this.$emit("menuSelect", obj);
     },
-    ...mapMutations("setting", ["setLang"]),
-  },
+    ...mapMutations("setting", ["setLang"])
+  }
 };
 </script>
 

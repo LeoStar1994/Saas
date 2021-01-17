@@ -16,13 +16,13 @@
                     :rules="rules"
                     :label-col="labelCol"
                     :wrapper-col="wrapperCol">
-        <a-form-model-item required
-                           label="角色名称"
+        <a-form-model-item label="角色名称"
                            prop="name">
           <a-input v-model="form.name"
                    :disabled="openType === 1"
+                   placeholder="请输入角色名称"
                    allowClear
-                   :maxLength="20" />
+                   :maxLength="30" />
         </a-form-model-item>
         <a-form-model-item label="状态"
                            prop="state">
@@ -35,8 +35,9 @@
         <a-form-model-item label="备注"
                            prop="remark">
           <a-input v-model="form.remark"
-                   :maxLength="500"
+                   :maxLength="200"
                    :disabled="openType === 1"
+                   placeholder="请输入备注"
                    allowClear
                    :auto-size="{ minRows: 3, maxRows: 5 }"
                    type="textarea" />
@@ -50,6 +51,10 @@
                     :disabled="openType === 1"
                     :tree-data="treeData" />
             <a-empty v-if="treeData.length === 0" />
+            <a-icon type="sync"
+                    title="刷新列表"
+                    class="syncRoles"
+                    @click="syncRoles" />
           </div>
         </a-form-model-item>
         <a-form-model-item :wrapper-col="{ span: 14, offset: 10 }">
@@ -80,13 +85,13 @@ export default {
   props: {
     configshow: {
       type: Boolean,
-      default: false,
+      default: false
     },
     treeData: {
       type: Array,
       required: true,
-      default: new Array(),
-    },
+      default: new Array()
+    }
   },
   data() {
     return {
@@ -97,13 +102,13 @@ export default {
       treeDefaultObject: {
         children: "children",
         title: "name",
-        key: "id",
+        key: "id"
       },
       form: {
         name: "",
         remark: "",
         selectedMenusList: [],
-        state: "0",
+        state: "0"
       },
       // 搜索项校验规则
       rules: {
@@ -111,14 +116,14 @@ export default {
           {
             required: true,
             message: "请输入角色名称",
-            trigger: "blur",
-          },
-        ],
-      },
+            trigger: "blur"
+          }
+        ]
+      }
     };
   },
   computed: {
-    ...mapState(["pageMinHeight"]),
+    ...mapState(["pageMinHeight"])
   },
   created() {},
   methods: {
@@ -126,20 +131,33 @@ export default {
       this.openType = openType;
       this.sequenceNumber = sequenceNumber;
       if (openType === 0) {
-        this.$nextTick(() => {
-          this.$refs.ruleForm.resetFields();
-        });
+        this.resetAllFields();
       }
     },
+
+    resetAllFields() {
+      this.form = {
+        name: "",
+        remark: "",
+        selectedMenusList: [],
+        state: "0"
+      };
+    },
+
+    // 刷新同步角色
+    syncRoles() {
+      this.$emit("syncRoles");
+    },
+
     // 保存
     onSubmit() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.ruleForm.validate(valid => {
         if (valid) {
           const data = { ...this.form };
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
-            addRole(data).then((res) => {
+            addRole(data).then(res => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -153,7 +171,7 @@ export default {
           } else if (this.openType === 2) {
             // 修改
             data.sequenceNumber = this.sequenceNumber;
-            updateRole(data).then((res) => {
+            updateRole(data).then(res => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -174,25 +192,23 @@ export default {
     resetForm() {
       this.$refs.ruleForm.resetFields();
       this.$emit("closeConfig");
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style lang="less" scoped>
-.roleConfig-page {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  margin-top: 24px;
-}
 .treebox {
+  position: relative;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
-  padding: 10px 0;
-  min-height: 180px;
+  padding: 20px 0;
+  min-height: 200px;
+  .syncRoles {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    cursor: pointer;
+  }
 }
 </style>

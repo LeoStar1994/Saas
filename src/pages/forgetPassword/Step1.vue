@@ -7,7 +7,7 @@
       <a-form-item>
         <a-input size="default"
                  placeholder="请输入手机号"
-                 :maxLength="13"
+                 :maxLength="30"
                  v-decorator="['mobile', {rules: [{ required: true, validator: handleCheckMobile, whitespace: true}]}]">
           <a-icon slot="prefix"
                   type="mobile" />
@@ -62,7 +62,7 @@ export default {
       form: this.$form.createForm(this),
       fetchingCode: false,
       countDownSceonds: 60,
-      timer: null,
+      timer: null
     };
   },
   methods: {
@@ -90,7 +90,7 @@ export default {
       }, 1000);
       const mobile = this.form.getFieldValue("mobile");
       // ajax
-      forgetSMSCode({ mobile }).then((res) => {
+      forgetSMSCode({ mobile }).then(res => {
         console.log(result);
         const result = res.data;
         if (result.code === 0) {
@@ -103,10 +103,10 @@ export default {
 
     onSubmitCode(e) {
       e.preventDefault();
-      this.form.validateFields((err) => {
+      this.form.validateFields(err => {
         if (!err) {
           const allValues = this.form.getFieldsValue();
-          checkForgetSMSCode(allValues).then((res) => {
+          checkForgetSMSCode(allValues).then(res => {
             const result = res.data;
             if (result.code === 0) {
               this.$emit("nextStep", allValues.mobile);
@@ -116,8 +116,8 @@ export default {
           });
         }
       });
-    },
-  },
+    }
+  }
 };
 </script>
 

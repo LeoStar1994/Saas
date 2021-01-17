@@ -15,7 +15,7 @@
       <a-form-item>
         <a-input size="default"
                  placeholder="请输入新密码"
-                 :maxLength="20"
+                 :maxLength="30"
                  type="password"
                  v-decorator="['newPassord', {rules: [{ required: true, message: '请输入密码', whitespace: true}]}]">
           <a-icon slot="prefix"
@@ -26,7 +26,7 @@
       <a-form-item>
         <a-input size="default"
                  placeholder="请再次输入新密码"
-                 :maxLength="20"
+                 :maxLength="30"
                  type="password"
                  v-decorator="['newPassordAgain', {rules: [{ required: true, validator: checkAgainPassword, whitespace: true}]}]">
           <a-icon slot="prefix"
@@ -56,13 +56,13 @@ export default {
   name: "Step2",
   props: {
     mobile: {
-      type: String,
-    },
+      type: String
+    }
   },
   data() {
     return {
       loading: false,
-      form2: this.$form.createForm(this),
+      form2: this.$form.createForm(this)
     };
   },
   methods: {
@@ -80,14 +80,14 @@ export default {
     // 下一步
     resetNewPassword(e) {
       e.preventDefault();
-      this.form2.validateFields((err) => {
+      this.form2.validateFields(err => {
         if (!err) {
           const allValues = this.form2.getFieldsValue();
           const data = {
             ...allValues,
-            mobile: this.mobile,
+            mobile: this.mobile
           };
-          resetPassword(data).then((res) => {
+          resetPassword(data).then(res => {
             const result = res.data;
             if (result.code === 0) {
               this.$emit("nextStep");
@@ -103,7 +103,7 @@ export default {
     nextStep() {
       let _this = this;
       _this.loading = true;
-      setTimeout(function () {
+      setTimeout(function() {
         _this.$emit("nextStep");
       }, 1500);
     },
@@ -111,8 +111,8 @@ export default {
     // 上一步
     prevStep() {
       this.$emit("prevStep");
-    },
-  },
+    }
+  }
 };
 </script>
 
