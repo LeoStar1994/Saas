@@ -210,31 +210,40 @@ export default {
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
-            addDongbuUser(data).then(res => {
-              this.$refs.loading.closeLoading();
-              const result = res.data;
-              if (result.code === 0) {
-                this.$message.success(result.desc);
-                this.$emit("closeConfig");
-                this.$emit("searchTableData");
-              } else {
-                this.$message.error(result.desc);
-              }
-            });
+            addDongbuUser(data)
+              .then(res => {
+                this.$refs.loading.closeLoading();
+                const result = res.data;
+                if (result.code === 0) {
+                  this.$message.success(result.desc);
+                  this.$emit("closeConfig");
+                  this.$emit("searchTableData");
+                } else {
+                  this.$message.error(result.desc);
+                }
+              })
+              .catch(() => {
+                this.$refs.loading.closeLoading();
+              });
           } else if (this.openType === 2) {
+            this.$refs.loading.openLoading("操作进行中，请稍后。。");
             // 修改
             data.sequenceNumber = this.sequenceNumber;
-            updateDongbuUser(data).then(res => {
-              this.$refs.loading.closeLoading();
-              const result = res.data;
-              if (result.code === 0) {
-                this.$message.success(result.desc);
-                this.$emit("closeConfig");
-                this.$emit("searchTableData");
-              } else {
-                this.$message.error(result.desc);
-              }
-            });
+            updateDongbuUser(data)
+              .then(res => {
+                this.$refs.loading.closeLoading();
+                const result = res.data;
+                if (result.code === 0) {
+                  this.$message.success(result.desc);
+                  this.$emit("closeConfig");
+                  this.$emit("searchTableData");
+                } else {
+                  this.$message.error(result.desc);
+                }
+              })
+              .catch(() => {
+                this.$refs.loading.closeLoading();
+              });
           }
         } else {
           return false;

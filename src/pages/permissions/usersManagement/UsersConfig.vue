@@ -79,11 +79,15 @@
         <a-form-model-item label="角色"
                            prop="roles">
           <div class="treebox">
-            <a-tree v-model="form.roles"
-                    checkable
-                    :disabled="openType === 1"
-                    :replaceFields='treeDefaultObject'
-                    :tree-data="treeData" />
+            <a-radio-group v-model="form.roles"
+                           :disabled="openType === 1">
+              <a-radio :value="item.id"
+                       class="d-block pl-10 mb-4"
+                       v-for="item in treeData"
+                       :key="item.id">
+                {{item.name}}
+              </a-radio>
+            </a-radio-group>
             <a-empty v-if="treeData.length === 0" />
             <a-icon type="sync"
                     title="刷新列表"
@@ -134,17 +138,13 @@ export default {
       passwordType: "password",
       labelCol: { span: 5 },
       wrapperCol: { span: 11, offset: 1 },
-      treeDefaultObject: {
-        title: "name",
-        key: "id"
-      },
       form: {
         name: "",
         account: "",
         mobile: "",
         password: "",
         remark: "",
-        roles: [],
+        roles: "",
         state: "0"
       },
       // 搜索项校验规则
@@ -222,7 +222,7 @@ export default {
         mobile: "",
         password: "",
         remark: "",
-        roles: [],
+        roles: "",
         state: "0"
       };
       this.passwordType = "password";
@@ -237,7 +237,7 @@ export default {
     onSubmit() {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
-          const data = { ...this.form };
+          const data = { ...this.form, roles: new Array(this.form.roles) };
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增

@@ -290,7 +290,7 @@ export default {
             mobile: result.data.mobile,
             password: result.data.password,
             remark: result.data.remark,
-            roles: result.data.roles,
+            roles: result.data.roles[0] ? result.data.roles[0] : "",
             state: result.data.state.toString()
           };
         } else {

@@ -3,11 +3,12 @@ import Cookie from "js-cookie";
 
 // 跨域认证信息 header 名
 const xsrfHeaderName = "Authorization";
+const xsrfCookieName = "saasAuthorization";
 
 axios.defaults.timeout = 5000;
 axios.defaults.withCredentials = true;
 axios.defaults.xsrfHeaderName = xsrfHeaderName;
-axios.defaults.xsrfCookieName = xsrfHeaderName;
+axios.defaults.xsrfCookieName = xsrfCookieName;
 
 // 认证类型
 const AUTH_TYPE = {
@@ -52,7 +53,7 @@ async function request(url, method, params) {
 function setAuthorization(auth, authType = AUTH_TYPE.BEARER) {
   switch (authType) {
     case AUTH_TYPE.BEARER:
-      Cookie.set(xsrfHeaderName, "Bearer " + auth.token, {
+      Cookie.set(xsrfCookieName, "Bearer " + auth.token, {
         expires: auth.expireAt
       });
       break;
@@ -71,7 +72,7 @@ function setAuthorization(auth, authType = AUTH_TYPE.BEARER) {
 function removeAuthorization(authType = AUTH_TYPE.BEARER) {
   switch (authType) {
     case AUTH_TYPE.BEARER:
-      Cookie.remove(xsrfHeaderName);
+      Cookie.remove(xsrfCookieName);
       break;
     case AUTH_TYPE.BASIC:
     case AUTH_TYPE.AUTH1:
@@ -89,7 +90,7 @@ function removeAuthorization(authType = AUTH_TYPE.BEARER) {
 function checkAuthorization(authType = AUTH_TYPE.BEARER) {
   switch (authType) {
     case AUTH_TYPE.BEARER:
-      if (Cookie.get(xsrfHeaderName)) {
+      if (Cookie.get(xsrfCookieName)) {
         return true;
       }
       break;

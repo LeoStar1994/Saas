@@ -26,22 +26,17 @@
       </a-menu-item>
     </a-menu>
 
-    <AuditPassword ref="auditPassword"></AuditPassword>
   </a-dropdown>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 import { logout } from "@/services/user";
-import AuditPassword from "@/pages/auditPassword/AuditPassword";
 
 export default {
   name: "HeaderAvatar",
   computed: {
     ...mapGetters("account", ["user"])
-  },
-  components: {
-    AuditPassword
   },
   methods: {
     logout() {
