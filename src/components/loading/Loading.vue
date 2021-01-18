@@ -2,7 +2,7 @@
  * @Description: loading
  * @Author: Leo
  * @Date: 2020-12-24 17:54:52
- * @LastEditTime: 2020-12-24 18:27:04
+ * @LastEditTime: 2021-01-18 18:56:56
  * @LastEditors: Leo
 -->
 
@@ -11,7 +11,8 @@
     <div class="w100p h100p pos-fixed alarm-loading alarm-box-loading"
          style="z-index: 5000; top: 0; right: 0; bottom: 0; left: 0;"
          v-show="animateLoading">
-      <div class="opacity-70p bg-black w100p h100p pos-relative">
+      <div class="bg-black w100p h100p pos-relative"
+           style="opacity: 70%;">
         <div class="w400 h100 pos-absolute loading-box-wrap"
              style="left: 50%; top: 50%; transform:translate(-50%); ">
           <div class="text-center">

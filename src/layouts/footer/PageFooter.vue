@@ -1,6 +1,7 @@
 <template>
   <div class="footer">
-    <div class="copyright">
+    <div class="copyright"
+         :class="[$route.path.includes('/login') ? 'text-white': '']">
       {{copyright}}
       <p>客服电话：400-12345678</p>
     </div>
@@ -10,7 +11,7 @@
 <script>
 export default {
   name: "PageFooter",
-  props: ["copyright"]
+  props: ["copyright"],
 };
 </script>
 

@@ -2,7 +2,7 @@
  * @Description: 忘记密码弹框
  * @Author: Leo
  * @Date: 2021-01-05 17:03:57
- * @LastEditTime: 2021-01-06 13:40:02
+ * @LastEditTime: 2021-01-18 12:19:10
  * @LastEditors: Leo
 -->
 <template>
@@ -12,8 +12,7 @@
            :maskClosable="false"
            centered
            destroyOnClose
-           @cancel="handleClose"
-           @ok="handleClose">
+           @cancel="handleClose">
     <a-card :bordered="false">
       <a-steps class="steps"
                :current="current">
@@ -35,6 +34,10 @@
                @finish="finish"></step3>
       </div>
     </a-card>
+    <template slot="footer">
+      <a-button type="primary"
+                @click="handleClose">关闭</a-button>
+    </template>
   </a-modal>
 
 </template>

@@ -2,7 +2,7 @@
  * @Description: 修改密码弹框
  * @Author: Leo
  * @Date: 2021-01-05 17:03:57
- * @LastEditTime: 2021-01-06 13:40:02
+ * @LastEditTime: 2021-01-18 13:30:01
  * @LastEditors: Leo
 -->
 <template>
@@ -20,6 +20,7 @@
         <a-form-model-item label="旧密码"
                            prop="oldPassword">
           <a-input v-model="form.oldPassword"
+                   placeholder="请输入旧密码"
                    :type="passwordType"
                    :maxLength="30">
             <a-icon slot="prefix"
@@ -38,6 +39,7 @@
                            prop="newPassword">
           <a-input v-model="form.newPassword"
                    :type="passwordType1"
+                   placeholder="请输入新密码"
                    :maxLength="30">
             <a-icon slot="prefix"
                     type="lock" />
@@ -54,6 +56,7 @@
         <a-form-model-item label="确认新密码"
                            prop="newPasswordAgain">
           <a-input v-model="form.newPasswordAgain"
+                   placeholder="请再次输入新密码"
                    :type="passwordType2"
                    :maxLength="30">
             <a-icon slot="prefix"
@@ -94,7 +97,7 @@ import { aduitPassword } from "@/services/user";
 export default {
   name: "AuditPassword",
   computed: {
-    ...mapState("setting", ["pageMinHeight"])
+    ...mapState("setting", ["pageMinHeight"]),
   },
   data() {
     return {
@@ -103,21 +106,21 @@ export default {
       form: {
         oldPassword: undefined,
         newPassword: undefined,
-        newPasswordAgain: undefined
+        newPasswordAgain: undefined,
       },
       rules: {
         oldPassword: [
           {
             required: true,
             message: "请输入旧密码！",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 6,
             max: 30,
             message: "请输入6-30位密码！",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         newPassword: [
           {
@@ -125,8 +128,8 @@ export default {
             min: 6,
             max: 30,
             trigger: "blur",
-            validator: this.checkOldToNew
-          }
+            validator: this.checkOldToNew,
+          },
         ],
         newPasswordAgain: [
           {
@@ -134,13 +137,13 @@ export default {
             min: 6,
             max: 30,
             trigger: "blur",
-            validator: this.checkAgainPassword
-          }
-        ]
+            validator: this.checkAgainPassword,
+          },
+        ],
       },
       passwordType: "password",
       passwordType1: "password",
-      passwordType2: "password"
+      passwordType2: "password",
     };
   },
   methods: {
@@ -172,12 +175,12 @@ export default {
 
     // 确定
     auditNewPassword() {
-      this.$refs.ruleForm.validate(valid => {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           const data = { ...this.form };
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           aduitPassword(data)
-            .then(res => {
+            .then((res) => {
               this.$refs.loading.closeLoading();
               const result = res.data;
               if (result.code === 0) {
@@ -189,7 +192,7 @@ export default {
                   okType: "primary",
                   onOk() {
                     _this.$router.push("/login");
-                  }
+                  },
                 });
               } else {
                 this.$message.error(result.desc);
@@ -214,13 +217,13 @@ export default {
     cancalAudit() {
       this.resetAllFields();
       this.$router.go(-1);
-    }
+    },
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
+    next((vm) => {
       vm.resetAllFields();
     });
-  }
+  },
 };
 </script>
 

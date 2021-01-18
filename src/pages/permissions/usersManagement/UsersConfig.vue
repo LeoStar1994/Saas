@@ -2,7 +2,7 @@
  * @Description: 用户管理details详情页
  * @Author: Leo
  * @Date: 2020-12-23 14:52:44
- * @LastEditTime: 2020-12-25 15:31:47
+ * @LastEditTime: 2021-01-18 19:38:32
  * @LastEditors: Leo
 -->
 <template>
@@ -123,13 +123,13 @@ export default {
   props: {
     configshow: {
       type: Boolean,
-      default: false
+      default: false,
     },
     treeData: {
       type: Array,
       required: true,
-      default: new Array()
-    }
+      default: new Array(),
+    },
   },
   data() {
     return {
@@ -145,7 +145,7 @@ export default {
         password: "",
         remark: "",
         roles: "",
-        state: "0"
+        state: "0",
       },
       // 搜索项校验规则
       rules: {
@@ -153,8 +153,8 @@ export default {
           {
             required: true,
             message: "请输入用户",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
           // {
           //   min: 3,
           //   max: 10,
@@ -166,44 +166,44 @@ export default {
           {
             required: true,
             message: "请输入账号！",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
             message: "账号必须输入邮箱！",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             message: "请输入密码！",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 6,
             max: 30,
             message: "请输入6-30位密码！",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         mobile: [
           {
             required: true,
             message: "请输入手机号！",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             pattern: /^1\d{10}$/,
             message: "请输入正确手机号！",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   computed: {
-    ...mapState(["pageMinHeight"])
+    ...mapState(["pageMinHeight"]),
   },
   created() {},
   methods: {
@@ -223,49 +223,61 @@ export default {
         password: "",
         remark: "",
         roles: "",
-        state: "0"
+        state: "0",
       };
       this.passwordType = "password";
     },
 
     // 刷新同步角色
     syncRoles() {
-      this.$emit("syncRoles");
+      if (this.openType === 0) {
+        this.$emit("initSyncRoles", this.sequenceNumber);
+      } else if (this.openType === 1) {
+        this.$emit("syncRoles", this.sequenceNumber);
+      }
     },
 
     // 保存
     onSubmit() {
-      this.$refs.ruleForm.validate(valid => {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
-          const data = { ...this.form, roles: new Array(this.form.roles) };
+          const data = { ...this.form, roles: [this.form.roles] };
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
-            addUser(data).then(res => {
-              this.$refs.loading.closeLoading();
-              const result = res.data;
-              if (result.code === 0) {
-                this.$message.success(result.desc);
-                this.$emit("closeConfig");
-                this.$emit("searchTableData");
-              } else {
-                this.$message.error(result.desc);
-              }
-            });
+            addUser(data)
+              .then((res) => {
+                this.$refs.loading.closeLoading();
+                const result = res.data;
+                if (result.code === 0) {
+                  this.$message.success(result.desc);
+                  this.$emit("closeConfig");
+                  this.$emit("searchTableData");
+                } else {
+                  this.$message.error(result.desc);
+                }
+              })
+              .catch(() => {
+                this.$refs.loading.closeLoading();
+              });
           } else if (this.openType === 2) {
             // 修改
             data.sequenceNumber = this.sequenceNumber;
-            updateUser(data).then(res => {
-              this.$refs.loading.closeLoading();
-              const result = res.data;
-              if (result.code === 0) {
-                this.$message.success(result.desc);
-                this.$emit("closeConfig");
-                this.$emit("searchTableData");
-              } else {
-                this.$message.error(result.desc);
-              }
-            });
+            updateUser(data)
+              .then((res) => {
+                this.$refs.loading.closeLoading();
+                const result = res.data;
+                if (result.code === 0) {
+                  this.$message.success(result.desc);
+                  this.$emit("closeConfig");
+                  this.$emit("searchTableData");
+                } else {
+                  this.$message.error(result.desc);
+                }
+              })
+              .catch(() => {
+                this.$refs.loading.closeLoading();
+              });
           }
         } else {
           return false;
@@ -277,8 +289,8 @@ export default {
       this.$refs.ruleForm.resetFields();
       this.passwordType = "password";
       this.$emit("closeConfig");
-    }
-  }
+    },
+  },
 };
 </script>
 

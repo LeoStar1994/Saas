@@ -2,7 +2,7 @@
  * @Description: 动捕用户详情
  * @Author: Leo
  * @Date: 2020-12-25 16:35:52
- * @LastEditTime: 2020-12-25 17:04:45
+ * @LastEditTime: 2021-01-18 12:21:41
  * @LastEditors: Leo
 -->
 <template>
@@ -107,13 +107,13 @@ export default {
   props: {
     configshow: {
       type: Boolean,
-      default: false
+      default: false,
     },
     treeData: {
       type: Array,
       required: true,
-      default: new Array()
-    }
+      default: new Array(),
+    },
   },
   data() {
     return {
@@ -125,7 +125,7 @@ export default {
       treeDefaultObject: {
         children: "children",
         title: "name",
-        key: "id"
+        key: "id",
       },
       form: {
         account: "",
@@ -133,7 +133,7 @@ export default {
         mobile: "",
         remark: "",
         applicationIds: [],
-        state: "0"
+        state: "0",
       },
       // 搜索项校验规则
       rules: {
@@ -141,44 +141,44 @@ export default {
           {
             required: true,
             message: "请输入账号！",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
             message: "账号必须输入邮箱！",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             message: "请输入密码！",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 6,
             max: 30,
             message: "请输入6-30位密码！",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         mobile: [
           {
             required: true,
             message: "请输入手机号！",
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             pattern: /^1\d{10}$/,
             message: "请输入正确手机号！",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   computed: {
-    ...mapState(["pageMinHeight"])
+    ...mapState(["pageMinHeight"]),
   },
   created() {},
   methods: {
@@ -197,21 +197,21 @@ export default {
         mobile: "",
         remark: "",
         applicationIds: [],
-        state: "0"
+        state: "0",
       };
       this.passwordType = "password";
     },
 
     // 保存
     onSubmit() {
-      this.$refs.ruleForm.validate(valid => {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           const data = { ...this.form };
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
             addDongbuUser(data)
-              .then(res => {
+              .then((res) => {
                 this.$refs.loading.closeLoading();
                 const result = res.data;
                 if (result.code === 0) {
@@ -226,11 +226,10 @@ export default {
                 this.$refs.loading.closeLoading();
               });
           } else if (this.openType === 2) {
-            this.$refs.loading.openLoading("操作进行中，请稍后。。");
             // 修改
             data.sequenceNumber = this.sequenceNumber;
             updateDongbuUser(data)
-              .then(res => {
+              .then((res) => {
                 this.$refs.loading.closeLoading();
                 const result = res.data;
                 if (result.code === 0) {
@@ -255,8 +254,8 @@ export default {
       this.$refs.ruleForm.resetFields();
       this.passwordType = "password";
       this.$emit("closeConfig");
-    }
-  }
+    },
+  },
 };
 </script>
 

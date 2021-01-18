@@ -16,10 +16,15 @@
   height: 0;
 }
 
+.clearfix {
+  *zoom: 1;
+}
+
 .orangeButton {
   border-color: orange !important;
   background-color: orange !important;
   color: #fff !important;
+  border-radius: 4px;
 
   &:hover {
     border-color: orange !important;
@@ -31,6 +36,7 @@
   border-color: #52C41A !important;
   background-color: #52C41A !important;
   color: #fff !important;
+  border-radius: 4px;
 
   &:hover {
     border-color: #52C41A !important;
@@ -46,9 +52,6 @@
   }
 }
 
-.clearfix {
-  *zoom: 1;
-}
 
 //float
 .fl {
@@ -170,13 +173,13 @@ each(@text-directions, {
 );
 
 // opacity
-each(@percents, {
-    .opacity-@{key} {
-      opacity: @value
-    }
-  }
+// each(@percents, {
+//     .opacity-@{key} {
+//       opacity: @value
+//     }
+//   }
 
-);
+// );
 
 // display
 each(@dispalys, {
