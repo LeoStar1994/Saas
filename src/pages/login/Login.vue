@@ -2,7 +2,7 @@
  * @Description: login登录页面.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2021-01-18 12:13:31
+ * @LastEditTime: 2021-01-19 14:24:28
  * @LastEditors: Leo
 -->
 
@@ -337,7 +337,7 @@ export default {
       this.logging = false;
       const loginRes = {
         ...res.data,
-        expireAt: new Date(new Date(new Date().getTime() + 30 * 60 * 1000)),
+        expireAt: new Date(new Date(new Date().getTime() + 4 * 60 * 60 * 1000)),
         user: { ...userInfo },
         message: this.timeFix().CN + "，欢迎回来",
       };
