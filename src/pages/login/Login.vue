@@ -2,7 +2,7 @@
  * @Description: login登录页面.
  * @Author: Leo
  * @Date: 2020-12-17 17:39:10
- * @LastEditTime: 2021-01-19 14:24:28
+ * @LastEditTime: 2021-01-20 15:21:58
  * @LastEditors: Leo
 -->
 
@@ -35,13 +35,12 @@
           <a-form @submit="onSubmit"
                   :form="form">
             <a-form-item>
-              <!-- 账户名 -->
+              <!-- 账号 -->
               <a-input autocomplete="autocomplete"
                        size="default"
                        :maxLength="30"
                        placeholder="请输入您的账号"
-                       v-decorator="['account', {rules: [{ required: true, whitespace: true, message: '请输入您的账号'}]}]">
-                <!-- validator: handleCheckAccount -->
+                       v-decorator="['account', {rules: [{ required: true, whitespace: true, validator: handleCheckAccount}]}]">
                 <a-icon slot="prefix"
                         type="user" />
               </a-input>
@@ -70,12 +69,13 @@
               <div class="d-flex ai-center">
                 <a-input size="default"
                          placeholder="请输入验证码"
-                         class="flex-1 mr-16"
+                         style="width: 60%; margin-right: 5%"
                          :maxLength="4"
                          v-decorator="['verifyCode', {rules: [{ required: true, message: '请输入验证码', whitespace: true}]}]">
                 </a-input>
                 <img :src="verifyCodeImgUrl"
-                     class="w30p h30 cursor-pointer"
+                     style="width: 35%"
+                     class="h30 cursor-pointer"
                      @click="fetchVerifyCode"
                      alt="图形验证码">
               </div>
