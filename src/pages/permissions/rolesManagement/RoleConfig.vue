@@ -2,7 +2,7 @@
  * @Description: 角色管理详情
  * @Author: Leo
  * @Date: 2020-12-25 11:00:00
- * @LastEditTime: 2021-01-18 19:39:31
+ * @LastEditTime: 2021-01-22 20:00:19
  * @LastEditors: Leo
 -->
 <template>
@@ -49,6 +49,8 @@
                     checkable
                     :replaceFields='treeDefaultObject'
                     :disabled="openType === 1"
+                    :checkedKeys="rolesSelectedRowKeys"
+                    @check="rolesSelectChange"
                     :tree-data="treeData" />
             <a-empty v-if="treeData.length === 0" />
             <a-icon type="sync"
@@ -97,6 +99,11 @@ export default {
     return {
       openType: null, // 0新增 1查看 2修改
       sequenceNumber: null, // 修改时使用，id
+
+      rolesSelectedRowKeys: [],
+      allSelectedNodes: [],
+      childrenArr: [],
+
       labelCol: { span: 5 },
       wrapperCol: { span: 11, offset: 1 },
       treeDefaultObject: {
@@ -144,6 +151,49 @@ export default {
       };
     },
 
+    rolesSelectChange(selectedKeys, info) {
+      // 已勾选子节点以及半勾选状态的父节点
+      this.allSelectedNodes = selectedKeys.concat(info.halfCheckedKeys);
+      this.rolesSelectedRowKeys = selectedKeys;
+    },
+
+    // 1.循环遍历出最深层子节点，存放在一个数组中
+    getTreeChildren(data) {
+      data &&
+        data.map((item) => {
+          if (item.children && item.children.length > 0) {
+            this.getTreeChildren(item.children);
+          } else {
+            this.childrenArr.push(item.id);
+          }
+          return null;
+        });
+      return this.childrenArr;
+    },
+
+    // 2.将后台返回的含有父节点的数组和第一步骤遍历的数组做比较
+    // 3.如果有相同值，将相同值取出来，push到一个新数组中
+    compareItem(all_data, child_data) {
+      let uniqueChild = [];
+      for (var i in child_data) {
+        for (var k in all_data) {
+          if (all_data[k] === child_data[i]) {
+            uniqueChild.push(all_data[k]);
+          }
+        }
+      }
+      return uniqueChild;
+    },
+
+    handleOpenEdit(data) {
+      const childData = this.getTreeChildren(this.treeData);
+      const uniqueChild = this.compareItem(data.selectedMenusList, childData);
+      this.form = {
+        ...data,
+        selectedMenusList: uniqueChild,
+      };
+    },
+
     // 刷新同步角色
     syncRoles() {
       if (this.openType === 0) {
@@ -157,7 +207,10 @@ export default {
     onSubmit() {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
-          const data = { ...this.form };
+          const data = {
+            ...this.form,
+            selectedMenusList: this.allSelectedNodes,
+          };
           this.$refs.loading.openLoading("操作进行中，请稍后。。");
           if (this.openType === 0) {
             // 新增
